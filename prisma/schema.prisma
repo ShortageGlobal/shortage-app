@@ -20,3 +20,23 @@ model Session {
   accessToken String
   userId      BigInt?
 }
+
+model ShortageProductPair {
+  id Int @id @default(autoincrement())
+
+  // Shopify
+  shop             String
+  productId        String
+  productVariantId String
+
+  // Shortage
+  shortageOrganizationId   String
+  shortageOrganizationName String
+  shortageProductId        String
+  shortageProductName      String
+  shortageProductImage     String
+  shortageVariantId        String?
+
+  // Meta
+  createdAt DateTime @default(now())
+}

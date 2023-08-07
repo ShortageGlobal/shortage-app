@@ -1,16 +1,20 @@
-import { json, redirect } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
+import { json, redirect } from '@remix-run/node';
+import { Form, useLoaderData } from '@remix-run/react';
 
-import { login } from "../../shopify.server";
+import { login } from '../../shopify.server';
 
-import indexStyles from "./style.css";
+import indexStyles from './style.css';
+import { cssBundleHref } from '@remix-run/css-bundle';
 
-export const links = () => [{ rel: "stylesheet", href: indexStyles }];
+export const links = () => [
+  { rel: 'stylesheet', href: indexStyles },
+  ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
+];
 
 export async function loader({ request }) {
   const url = new URL(request.url);
 
-  if (url.searchParams.get("shop")) {
+  if (url.searchParams.get('shop')) {
     throw redirect(`/app?${url.searchParams.toString()}`);
   }
 
@@ -21,18 +25,18 @@ export default function App() {
   const { showForm } = useLoaderData();
 
   return (
-    <div className="index">
-      <div className="content">
+    <div className='index'>
+      <div className='content'>
         <h1>A short heading about [your app]</h1>
         <p>A tagline about [your app] that describes your value proposition.</p>
         {showForm && (
-          <Form method="post" action="/auth/login">
+          <Form method='post' action='/auth/login'>
             <label>
               <span>Shop domain</span>
-              <input type="text" name="shop" />
+              <input type='text' name='shop' />
               <span>e.g: my-shop-domain.myshopify.com</span>
             </label>
-            <button type="submit">Log in</button>
+            <button type='submit'>Log in</button>
           </Form>
         )}
         <ul>

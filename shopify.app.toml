@@ -1,3 +1,27 @@
-# This file stores configurations for your Shopify app.
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
+name = "Shortage"
+client_id = "69a6e5a205de48ea6c012567bfa5c6e1"
+application_url = "https://boy-sg-prepaid-regression.trycloudflare.com"
+embedded = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
 scopes = "write_products"
+
+[auth]
+redirect_urls = [
+  "https://boy-sg-prepaid-regression.trycloudflare.com/auth/callback",
+  "https://boy-sg-prepaid-regression.trycloudflare.com/auth/shopify/callback",
+  "https://boy-sg-prepaid-regression.trycloudflare.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2023-07"
+
+[pos]
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "shortagedev.myshopify.com"

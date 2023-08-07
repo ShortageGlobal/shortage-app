@@ -1,5 +1,5 @@
 {
-  "name": "shortage-app",
+  "name": "shortage-shopify-app",
   "private": true,
   "scripts": {
     "build": "NODE_ENV=production remix build",
@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@prisma/client": "^4.13.0",
+    "@remix-run/css-bundle": "^1.19.2",
     "@remix-run/node": "^1.19.1",
     "@remix-run/react": "^1.19.1",
     "@remix-run/serve": "^1.19.1",
@@ -47,5 +48,5 @@
     "web/frontend",
     "extensions/*"
   ],
-  "author": "serhii"
+  "author": "Serhii Holinei serhii@shortage.global"
 }

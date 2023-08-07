@@ -1,6 +1,6 @@
-# Shopify App Template - Remix
+# Shortage Shopify App
 
-This is a template for building a [Shopify app](https://shopify.dev/docs/apps/getting-started) using the [Remix](https://remix.run) framework.
+Based on a template for building a [Shopify app](https://shopify.dev/docs/apps/getting-started) using the [Remix](https://remix.run) framework.
 
 <!-- TODO: Uncomment this after we've started using the template in the CLI -->
 <!-- Rather than cloning this repo, you can use your preferred package manager and the Shopify CLI with [these steps](#installing-the-template). -->
@@ -60,6 +60,20 @@ pnpm run dev
 Press P to open the URL to your app. Once you click install, you can start development.
 
 Local development is powered by [the Shopify CLI](https://shopify.dev/docs/apps/tools/cli). It logs into your partners account, connects to an app, provides environment variables, updates remote config, creates a tunnel and provides commands to generate extensions.
+
+#### Migration
+
+Run the following command to apply migrations in Prisma:
+
+```shell
+npm run prisma migrate dev -- --name <migration-name>
+```
+
+To confirm that your migration worked, open [Prisma Studio](https://www.prisma.io/docs/concepts/components/prisma-studio):
+
+```shell
+npm run prisma studio
+```
 
 ### Authenticating and querying data
 
