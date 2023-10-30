@@ -1,29 +1,37 @@
-import "@shopify/shopify-app-remix/adapters/node";
+import '@shopify/shopify-app-remix/adapters/node';
 import {
   AppDistribution,
   DeliveryMethod,
   shopifyApp,
   LATEST_API_VERSION,
-} from "@shopify/shopify-app-remix";
-import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
-import { restResources } from "@shopify/shopify-api/rest/admin/2023-07";
+} from '@shopify/shopify-app-remix';
+import { PrismaSessionStorage } from '@shopify/shopify-app-session-storage-prisma';
+import { restResources } from '@shopify/shopify-api/rest/admin/2023-07';
 
-import prisma from "./db.server";
+import prisma from './db.server';
 
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
-  apiSecretKey: process.env.SHOPIFY_API_SECRET || "",
+  apiSecretKey: process.env.SHOPIFY_API_SECRET || '',
   apiVersion: LATEST_API_VERSION,
-  scopes: process.env.SCOPES?.split(","),
-  appUrl: process.env.SHOPIFY_APP_URL || "",
-  authPathPrefix: "/auth",
+  scopes: process.env.SCOPES?.split(','),
+  appUrl: process.env.SHOPIFY_APP_URL || '',
+  authPathPrefix: '/auth',
   sessionStorage: new PrismaSessionStorage(prisma),
   distribution: AppDistribution.AppStore,
   restResources,
   webhooks: {
     APP_UNINSTALLED: {
       deliveryMethod: DeliveryMethod.Http,
-      callbackUrl: "/webhooks",
+      callbackUrl: '/webhooks',
+    },
+    PRODUCTS_UPDATE: {
+      deliveryMethod: DeliveryMethod.Http,
+      callbackUrl: '/webhooks',
+    },
+    ORDERS_CREATE: {
+      deliveryMethod: DeliveryMethod.Http,
+      callbackUrl: '/webhooks',
     },
   },
   hooks: {
