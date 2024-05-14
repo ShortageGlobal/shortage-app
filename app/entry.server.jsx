@@ -5,7 +5,6 @@ import { RemixServer } from "@remix-run/react";
 import { isbot } from "isbot";
 
 import { addDocumentResponseHeaders } from "./shopify.server";
-import getProduct from "./services/GetProduct";
 
 const ABORT_DELAY = 5_000;
 
@@ -17,37 +16,14 @@ export default async function handleRequest(
 	_loadContext
 ) {
 	addDocumentResponseHeaders(request, responseHeaders);
-	console.log("🚀 ~ request:", request.url)
+	console.log(' ')
+	console.log('process.env.HOST:', process.env.SHOPIFY_APP_URL)
+	console.log('SHOPIFY_API_VERSION:', process.env.SHOPIFY_API_VERSION);
+	console.log(' ')
 	
 	const callbackName = isbot(request.headers.get("user-agent") || "")
 	? "onAllReady"
-	: "onShellReady";
-	
-	
-	if(request.url.indexOf('/getPair') > -1){
-		const url = new URL(request.url);
-		const prodId = url.searchParams.get('prod');
-		
-		return new Promise((res, rej) => {
-			getProduct(prodId).then(result => {
-				console.log("🚀 ~ getProduct ~ result:", result);
-				res(
-					new Response(JSON.stringify(result), {
-						headers: { 'Content-Type': 'application/json' },
-						status: 200,
-					})
-				);
-			}).catch(error => {
-				console.error("Error in getProduct:", error);
-				rej(new Response(JSON.stringify({ error: "Product not found" }), {
-					headers: { 'Content-Type': 'application/json' },
-					status: 404,
-				}));
-			});
-		})
-	}
-	
-	
+	: "onShellReady"; 
 	
 	
 	return new Promise((resolve, reject) => {

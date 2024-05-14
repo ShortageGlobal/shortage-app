@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		
 		if(!window.product_id) return;
 
-		fetch('https://device-months-parcel-magazines.trycloudflare.com/getPair?prod='+ window.product_id).then(res => res.json()).then(data => {
+		fetch('https://nhl-raid-kinase-polyphonic.trycloudflare.com/pair?prod='+ window.product_id).then(res => res.json()).then(data => {
 			console.log("🚀 ~ data:", data);
 			if(data) injectButton();
 		})

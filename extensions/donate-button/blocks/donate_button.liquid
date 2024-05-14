@@ -1,0 +1,97 @@
+
+<div class="donate_wrapper"></div>
+
+<script>
+var product_id = {{product.id}};
+var tunel_url = 'https://horror-sampling-staffing-electoral.trycloudflare.com';
+
+// console.log('process.env', process);
+document.addEventListener('DOMContentLoaded', function() {
+	function getPair() {		
+		if(!product_id) return;
+
+		fetch(tunel_url + '/pair?prod='+ product_id).then(res => res.json()).then(data => {
+			console.log("🚀 ~ data:", data);
+			if(data) injectButton();
+		})
+	}
+
+	function getQuantity() {
+		return document.querySelector('[name="quantity"]') ? document.querySelector('[name="quantity"]').value : 1;
+	}
+
+	function getProdVarId() {
+		const params = window.location.search.split('variant=');
+		if (params.length > 1) {
+			return params[1].split('&')[0];
+		}
+		// document.querySelector('form[action="/cart/add"])
+		return document.querySelector('[name="quantity"]') ? document.querySelector('[name="id"]').value : null;
+	}
+
+
+	function donateThis(productVariantId = getProdVarId(), qty = getQuantity()) {
+		console.log('donateThis for: ', productVariantId);
+		if(!productVariantId) return;
+
+		fetch('/cart/add.js', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				items: [{
+				id: productVariantId,
+				quantity: qty,
+				properties: {
+					'For Donation': 'Yes'
+				}
+				}]
+			})
+		}).then(response => response.json())
+		.then(data => console.log(data))
+		.catch((error) => console.error('Error:', error));
+	}
+
+	function injectButton(txt = 'Donate this') {
+		document.querySelector('.donate_wrapper').appendChild(Object.assign(document.createElement('button'), {
+			innerHTML: txt,
+			id: 'newButtonId',
+			className: 'my-custom-class',
+			style: 'width: 100%; background: darkorange; border: navajowhite; line-height: 40px; margin-top: 10px; font-size: 14px;cursor: pointer;',
+			onclick: () => donateThis()
+		}));
+	}
+
+
+	var productJson = document.querySelector('script[type="application/json"]');
+	if (productJson) {
+		var productData = JSON.parse(productJson.innerText);
+		if (productData && productData.product) {
+			console.log("Product ID:", productData.product.id);
+		}
+	}	
+
+	//preview in editor mode
+	if (window.location.href.includes('oseid')) {
+		injectButton();
+	} else {
+		getPair();
+	}
+}); 
+</script>
+
+<style>
+	div[id^="shopify-block-shortage2_donate_button_"] {
+		margin: -25px 0 0 0;
+	}
+</style>
+
+{% schema %}
+{
+	"name": "Donate Button",
+	"target": "section",
+	"settings": []
+}
+{% endschema %}
+
