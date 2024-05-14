@@ -11,7 +11,7 @@ if (
   process.env.SHOPIFY_APP_URL = process.env.HOST;
   delete process.env.HOST;
 }
-
+delete process.env.REMIX_DEV_ORIGIN;
 /** @type {import('@remix-run/dev').AppConfig} */
 module.exports = {
   ignoredRouteFiles: ["**/.*"],
