@@ -11,10 +11,7 @@ export const action = async ({ request }) => {
       console.log('\n\n\nPRODUCTS_UPDATE\n\n\n');
       break;
     case "CHECKOUTS_CREATE":
-      console.log('\n\n HECKOUTS_CREATE\n\n\n', payload);
-      if (session) {
-        await handleOrderCreation(payload, shop, session.accessToken);
-      }
+      console.log('\n\n CHECKOUTS_CREATE\n\n\n', payload);
       break;
     case 'ORDERS_CREATE':
       console.log('');

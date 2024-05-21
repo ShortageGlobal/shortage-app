@@ -1,12 +1,10 @@
-import fetch from 'node-fetch'; 
+import fetch from 'node-fetch';
 require('dotenv').config();
 
 export async function handleOrderCreation(order, shop, accessToken) {
-	console.log('handleOrderCreation');
 	const hasDonation = order.line_items.some(item =>
 		item.properties && item.properties.some(prop => prop.name === 'For Donation' && prop.value === 'Yes')
-	);
-	
+	);	
 	if (hasDonation) {
 		await addOrderNote(shop, order.id, "This order contains items for donation. Please handle accordingly.", accessToken);
 	}
@@ -35,5 +33,4 @@ export async function addOrderNote(shop, orderId, note, accessToken) {
 		console.error('Failed to update order:', data);
 		throw new Error('Failed to update order');
 	}
-	console.log('Order updated with note:', data);
 }

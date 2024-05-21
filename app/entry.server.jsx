@@ -18,7 +18,6 @@ export default async function handleRequest(
 	addDocumentResponseHeaders(request, responseHeaders);
 	console.log(' ')
 	console.log('process.env.HOST:', process.env.SHOPIFY_APP_URL)
-	console.log('SHOPIFY_API_VERSION:', process.env.SHOPIFY_API_VERSION);
 	console.log(' ')
 	
 	const callbackName = isbot(request.headers.get("user-agent") || "")
