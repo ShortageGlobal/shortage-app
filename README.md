@@ -61,6 +61,23 @@ Press P to open the URL to your app. Once you click install, you can start devel
 
 Local development is powered by [the Shopify CLI](https://shopify.dev/docs/apps/tools/cli). It logs into your partners account, connects to an app, provides environment variables, updates remote config, creates a tunnel and provides commands to generate extensions.
 
+
+
+#### Replace Tunel Url
+
+After you have previewed your app (by pressing p) 
+you need to replace url in `extensions/donate-button/blocks/donate_button.liquid`
+by new one, which you can obtain from server console log, from line which start like that: "process.env.HOST: ### your new url ###"
+
+```js
+var tunel_url = '### you new url goes here ###';
+```
+
+like that:
+
+![Replace](docs/images/replace_url.png)
+
+
 #### Migration
 
 Run the following command to apply migrations in Prisma:
