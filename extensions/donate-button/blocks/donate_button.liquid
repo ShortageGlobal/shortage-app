@@ -5,14 +5,13 @@
 var product_id = {{product.id}};
 var tunel_url = 'https://norton-barriers-picture-surgeons.trycloudflare.com';
 
-// console.log('process.env', process);
 document.addEventListener('DOMContentLoaded', function() {
 	function getPair() {		
 		if(!product_id) return;
 
-		fetch(tunel_url + '/pair?prod='+ product_id).then(res => res.json()).then(data => {
+		fetch(tunel_url + '/pair?prodId='+ product_id).then(res => res.json()).then(data => {
 			console.log("🚀 ~ data:", data);
-			if(data) injectButton();
+			if(data && data.exists) injectButton();
 		})
 	}
 
@@ -25,7 +24,6 @@ document.addEventListener('DOMContentLoaded', function() {
 		if (params.length > 1) {
 			return params[1].split('&')[0];
 		}
-		// document.querySelector('form[action="/cart/add"])
 		return document.querySelector('[name="quantity"]') ? document.querySelector('[name="id"]').value : null;
 	}
 
