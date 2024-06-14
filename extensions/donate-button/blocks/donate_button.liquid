@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		if (params.length > 1) {
 			return params[1].split('&')[0];
 		}
-		return document.querySelector('[name="quantity"]') ? document.querySelector('[name="id"]').value : null;
+		return document.querySelector('[name="id"]') ? document.querySelector('[name="id"]').value : null;
 	}
 
 
