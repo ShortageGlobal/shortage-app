@@ -1,7 +1,7 @@
 import { Response } from "@remix-run/node"; // or cloudflare/deno
 import {
-  getPairByProdId,
-} from '../models/ProductPair.server';
+  getOrganization,
+} from '../services/Shortage.service.js';
 
 export const loader = async ({ request }) => {
   // Set CORS headers
@@ -14,21 +14,23 @@ export const loader = async ({ request }) => {
 	});
 
   const url = new URL(request.url);
-	const productId = url.searchParams.get('prodId');
+	const organizationSlug = url.searchParams.get('organizationSlug');
 
-  if(!productId) {  
-    return new Response(JSON.stringify({ success: false, message: 'productId is required' }), {
+  if(!organizationSlug) {  
+    return new Response(JSON.stringify({ success: false, message: 'organizationSlug is required' }), {
       status: 400,
       headers: headers
     });
   }
 
-  const productPair = await getPairByProdId(productId);
+  const organization = await getOrganization(organizationSlug);
+
+  console.log('organization', organization);
 
   return new Response(JSON.stringify({ 
     success: true, 
-    exists: !!productPair, 
-    product: productPair
+    exists: !!organization, 
+    organization: organization
   }), {
 		status: 200,
 		headers: headers

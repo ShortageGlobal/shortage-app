@@ -3,7 +3,8 @@
 
 <script>
 var product_id = {{product.id}};
-var tunel_url = 'https://norton-barriers-picture-surgeons.trycloudflare.com';
+var tunel_url = 'https://hosts-modelling-asin-parking.trycloudflare.com';
+var productPar = [];
 
 document.addEventListener('DOMContentLoaded', function() {
 	function getPair() {		
@@ -12,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		fetch(tunel_url + '/pair?prodId='+ product_id).then(res => res.json()).then(data => {
 			console.log("🚀 ~ data:", data);
 			if(data && data.exists) injectButton();
+			productPar = data.product;
 		})
 	}
 
@@ -27,10 +29,21 @@ document.addEventListener('DOMContentLoaded', function() {
 		return document.querySelector('[name="id"]') ? document.querySelector('[name="id"]').value : null;
 	}
 
+	async function getOrganisationInfo() {
+		if (!productPar) return;
 
-	function donateThis(productVariantId = getProdVarId(), qty = getQuantity()) {
+		const response = await fetch(tunel_url + '/organization?organizationSlug=' + productPar.shortageOrganizationId);
+		const data = await response.json();
+		console.log("🚀 ~ getOrganisationInfo:", data);
+		return data && data.exists ? data.organization : null;
+	}
+
+	async function donateThis(productVariantId = getProdVarId(), qty = getQuantity()) {
 		console.log('donateThis for: ', productVariantId);
 		if(!productVariantId) return;
+
+		const organization = await getOrganisationInfo();
+		if (!organization) return console.error('Organization not found!');
 
 		fetch('/cart/add.js', {
 			method: 'POST',
@@ -42,7 +55,11 @@ document.addEventListener('DOMContentLoaded', function() {
 				id: productVariantId,
 				quantity: qty,
 				properties: {
-					'For Donation': 'Yes'
+					'For Donation': 'Yes',
+					'Shipping Name': organization.name,
+					'Shipping Phone': organization.phone_number,
+					'Shipping City': organization.country + ', ' + organization.state_province_region + ', ' + organization.city + ', ' + organization.zip,
+					'Shipping Address': organization.address_line1 + ', ' + (organization.address_line2 ? organization.address_line2 : ''),
 				}
 				}]
 			})
