@@ -3,17 +3,19 @@
 
 <script>
 var product_id = {{product.id}};
-var tunel_url = 'https://hosts-modelling-asin-parking.trycloudflare.com';
-var productPar = [];
+var tunel_url = 'https://bond-vc-scenic-chest.trycloudflare.com';
+var productPair = [];
 
 document.addEventListener('DOMContentLoaded', function() {
+	const originalAddToCartButton = document.querySelector('[type="submit"][name="add"]');
+
 	function getPair() {		
 		if(!product_id) return;
 
 		fetch(tunel_url + '/pair?prodId='+ product_id).then(res => res.json()).then(data => {
 			console.log("🚀 ~ data:", data);
 			if(data && data.exists) injectButton();
-			productPar = data.product;
+			productPair = data.product;
 		})
 	}
 
@@ -30,21 +32,61 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 
 	async function getOrganisationInfo() {
-		if (!productPar) return;
+		if (!productPair) return;
 
-		const response = await fetch(tunel_url + '/organization?organizationSlug=' + productPar.shortageOrganizationId);
+		const response = await fetch(tunel_url + '/organization?organizationSlug=' + productPair.shortageOrganizationId);
 		const data = await response.json();
 		console.log("🚀 ~ getOrganisationInfo:", data);
 		return data && data.exists ? data.organization : null;
 	}
 
-	async function donateThis(productVariantId = getProdVarId(), qty = getQuantity()) {
-		console.log('donateThis for: ', productVariantId);
-		if(!productVariantId) return;
+	async function injectPropertiesAndSubmit(productVariantId = getProdVarId(), qty = getQuantity()) {
+		if (!productVariantId) return;
 
 		const organization = await getOrganisationInfo();
-		if (!organization) return console.error('Organization not found!');
+		if (!organization) {
+			console.error('Organization not found!');
+			return;
+		}
 
+		// Inject hidden fields with properties into the form
+		const form = originalAddToCartButton.closest('form[action="/cart/add"]'); // Find the parent Add to Cart form 
+		if (!form) {
+			console.error('Parent Add to Cart form not found!');
+			addToCart(productVariantId, qty);
+			return;
+		}
+
+		const properties = {
+			'For Donation': 'Yes',
+			'Shipping Name': organization.name,
+			'Shipping Phone': organization.phone_number,
+			'Shipping Address': `${organization.address_line1}, ${organization.address_line2 || ''}`,
+			'Shipping City': `${organization.country}, ${organization.state_province_region}, ${organization.city}, ${organization.zip}`
+		};
+
+		Object.keys(properties).forEach(key => {
+			const input = document.createElement('input');
+			input.classList = 'donate-property';
+			input.type = 'hidden';
+			input.name = `properties[${key}]`;
+			input.value = properties[key];
+			form.appendChild(input);
+		});
+
+		// Trigger the default Shopify Add to Cart button
+		if (originalAddToCartButton) {
+			originalAddToCartButton.click();
+			// delete all html properties
+			setTimeout(() => {
+				document.querySelectorAll('.donate-property').forEach(el => el.remove());
+			}, 0);
+		} else {
+			addToCart(productVariantId, qty);
+		}
+	}
+
+	function addToCart(productVariantId, qty) {
 		fetch('/cart/add.js', {
 			method: 'POST',
 			headers: {
@@ -64,20 +106,18 @@ document.addEventListener('DOMContentLoaded', function() {
 				}]
 			})
 		}).then(response => response.json())
-		.then(data => console.log(data))
+		.then(data => window.location.reload())
 		.catch((error) => console.error('Error:', error));
+
 	}
 
 	function injectButton(txt = 'Donate this') {
-		document.querySelector('.donate_wrapper').appendChild(Object.assign(document.createElement('button'), {
-			innerHTML: txt,
-			id: 'newButtonId',
-			className: 'my-custom-class',
-			style: 'width: 100%; background: darkorange; border: navajowhite; line-height: 40px; margin-top: 10px; font-size: 14px;cursor: pointer;',
-			onclick: () => donateThis()
-		}));
+		const btn = document.createElement('button');
+		btn.innerHTML = 'Donate This';
+		btn.style = 'width: 100%; background: darkorange; border: none; line-height: 40px; margin-top: 10px; font-size: 14px; cursor: pointer;';
+		btn.onclick = injectPropertiesAndSubmit;
+		document.querySelector('.donate_wrapper').appendChild(btn);
 	}
-
 
 	var productJson = document.querySelector('script[type="application/json"]');
 	if (productJson) {
