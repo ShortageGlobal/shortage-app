@@ -11,7 +11,10 @@ import {
   Pagination,
   Checkbox,
   Filters,
+  Icon,
+  TextField,
 } from '@shopify/polaris';
+import { SearchMinor } from '@shopify/polaris-icons';
 import {
   getProductId,
   getOrganizationAddress,
@@ -97,24 +100,29 @@ export function ShortageProductSelectModal({
 
   const filterControl = useMemo(() => {
     return (
-      <Filters
-        queryValue={searchQuery}
-        filters={[]}
-        onQueryChange={(value) => {
-          setSearchQuery(value);
-          setPageNumber(0);
-        }}
-        onQueryClear={() => {
-          setSearchQuery('');
-          setPageNumber(0);
-        }}
-        onClearAll={() => {
-          setSearchQuery('');
-          setPageNumber(0);
-        }}
-      />
+      <div className={styles.centeredFilter}>
+        <div style={{ width: '100%' }}>
+          <TextField 
+            prefix={<Icon source={SearchMinor} color="base" />} 
+            value={searchQuery}
+            onChange={(value) => {
+              setSearchQuery(value);
+              setPageNumber(0);
+            }}
+            placeholder="Search Products"
+            clearButton
+            onClearButtonClick={() => {
+              setSearchQuery('');
+              setPageNumber(0);
+            }}
+            label=""
+            autoComplete="off"
+          />
+        </div>
+      </div>
     );
   }, [searchQuery]);
+  
 
   const headerContent = useMemo(() => {
     const start = pageNumber * pageSize + 1;
@@ -142,30 +150,28 @@ export function ShortageProductSelectModal({
     >
       <Modal.Section>
         <VerticalStack>
+          <div>
+            {filterControl}
+          </div>
           <ResourceList
             loading={isLoading}
             resourceName={resourceName}
             items={items}
             alternateTool={pagination}
-            filterControl={filterControl}
             headerContent={headerContent}
             renderItem={(item) => {
               const { name, slug, photo, organization } = item;
-
               const id = getProductId({
                 slug,
                 orgSlug: organization.slug,
               });
-
               const productUrl = getProductAddress({
                 slug,
                 orgSlug: organization.slug,
               });
-
               const organizationUrl = getOrganizationAddress({
                 orgSlug: organization.slug,
               });
-
               return (
                 <div className={styles.listItem}>
                   <HorizontalStack gap='4' wrap={false} blockAlign='center'>
