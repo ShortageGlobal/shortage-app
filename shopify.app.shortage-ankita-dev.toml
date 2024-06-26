@@ -1,0 +1,27 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+name = "shortage-ankita-dev"
+client_id = "9dca903dc3498a3298c5ef1c240f84b7"
+application_url = "https://antibodies-new-monte-interactions.trycloudflare.com"
+embedded = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_products,write_products,read_orders,write_orders"
+
+[auth]
+redirect_urls = [
+  "https://antibodies-new-monte-interactions.trycloudflare.com/auth/callback",
+  "https://antibodies-new-monte-interactions.trycloudflare.com/auth/shopify/callback",
+  "https://antibodies-new-monte-interactions.trycloudflare.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2024-01"
+
+[pos]
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "quickstart-0992a394.myshopify.com"
