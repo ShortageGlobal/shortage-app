@@ -7,359 +7,359 @@ const tunel_url = 'https://eyed-advances-stack-symposium.trycloudflare.com';
 let productPair = null;
 
 document.addEventListener('DOMContentLoaded', function() {
-	const originalAddToCartButton = document.querySelector('[type="submit"][name="add"]');
+  const originalAddToCartButton = document.querySelector('[type="submit"][name="add"]');
 
-	function getPair() {		
-		if(!product_id) return;
+  function getPair() {    
+    if(!product_id) return;
 
-		fetch(tunel_url + '/pair?prodId='+ product_id).then(res => res.json()).then(data => {
-			if(data && data.exists) {
-				injectButton();
-				productPair = data.product;
-			}
-		})
-	}
+    fetch(tunel_url + '/pair?prodId='+ product_id).then(res => res.json()).then(data => {
+      if(data && data.exists) {
+        injectButton();
+        productPair = data.product;
+      }
+    })
+  }
 
-	function getQuantity() {
-		return document.querySelector('[name="quantity"]') ? document.querySelector('[name="quantity"]').value : 1;
-	}
+  function getQuantity() {
+    return document.querySelector('[name="quantity"]') ? document.querySelector('[name="quantity"]').value : 1;
+  }
 
-	function getProdVarId() {
-		const params = window.location.search.split('variant=');
-		if (params.length > 1) {
-			return params[1].split('&')[0];
-		}
-		return document.querySelector('[name="id"]') ? document.querySelector('[name="id"]').value : null;
-	}
+  function getProdVarId() {
+    const params = window.location.search.split('variant=');
+    if (params.length > 1) {
+      return params[1].split('&')[0];
+    }
+    return document.querySelector('[name="id"]') ? document.querySelector('[name="id"]').value : null;
+  }
 
-	async function getOrganisationInfo() {
-		if (!productPair) return;
+  async function getOrganisationInfo() {
+    if (!productPair) return;
 
-		const response = await fetch(tunel_url + '/organization?organizationSlug=' + productPair.shortageOrganizationId);
-		const data = await response.json();
-		return data && data.exists ? data.organization : null;
-	}
+    const response = await fetch(tunel_url + '/organization?organizationSlug=' + productPair.shortageOrganizationId);
+    const data = await response.json();
+    return data && data.exists ? data.organization : null;
+  }
 
-	async function injectPropertiesAndSubmit(productVariantId = getProdVarId(), qty = getQuantity()) {
-		if (!productVariantId || !productPair) return;
+  async function injectPropertiesAndSubmit(productVariantId = getProdVarId(), qty = getQuantity()) {
+    if (!productVariantId || !productPair) return;
 
-		const instruction = await getOrganisationInfo();
-		if (!instruction) {
-			console.error('Delivery instruction not found!');
-			return;
-		}
+    const instruction = await getOrganisationInfo();
+    if (!instruction) {
+      console.error('Delivery instruction not found!');
+      return;
+    }
 
-		// Inject hidden fields with properties into the form
-		const form = originalAddToCartButton.closest('form[action="/cart/add"]'); // Find the parent Add to Cart form 
-		if (!form) {
-			console.error('Parent Add to Cart form not found!');
-			addToCart(productVariantId, qty);
-			return;
-		}
+    // Inject hidden fields with properties into the form
+    const form = originalAddToCartButton.closest('form[action="/cart/add"]'); // Find the parent Add to Cart form 
+    if (!form) {
+      console.error('Parent Add to Cart form not found!');
+      addToCart(productVariantId, qty);
+      return;
+    }
 
-		const properties = {
-			'For Donation': 'Yes',
-			'Nonprofit Recipient': productPair.shortageOrganizationName,
-		};
+    const properties = {
+      'For Donation': 'Yes',
+      'Nonprofit Recipient': productPair.shortageOrganizationName,
+    };
 
-		const addressLine1 = instruction.address_line1;
-		const addressLine2 = instruction.address_line2;
-		const phoneNumber = instruction.phone_number;
-		const comment = instruction.comment;
+    const addressLine1 = instruction.address_line1;
+    const addressLine2 = instruction.address_line2;
+    const phoneNumber = instruction.phone_number;
+    const comment = instruction.comment;
 
-		// add address line 1
-		if (addressLine1) {
-			const addressKey = addressLine2 ? 'Delivery Address Line 1' : 'Delivery Address';
-			properties[addressKey] = addressLine1;
-		}
+    // add address line 1
+    if (addressLine1) {
+      const addressKey = addressLine2 ? 'Delivery Address Line 1' : 'Delivery Address';
+      properties[addressKey] = addressLine1;
+    }
 
-		// add address line 2
-		if (addressLine2) {
-			properties['Delivery Address Line 2'] = addressLine2;
-		}
+    // add address line 2
+    if (addressLine2) {
+      properties['Delivery Address Line 2'] = addressLine2;
+    }
 
-		// add city, state, zip, country
-		properties['Delivery City'] = `${instruction.city} ${instruction.state_province_region} ${instruction.zip}, ${instruction.country}`
+    // add city, state, zip, country
+    properties['Delivery City'] = `${instruction.city} ${instruction.state_province_region} ${instruction.zip}, ${instruction.country}`
 
-		// add phone number
-		if (phoneNumber) {
-			properties['Delivery Phone'] = phoneNumber;
-		}
+    // add phone number
+    if (phoneNumber) {
+      properties['Delivery Phone'] = phoneNumber;
+    }
 
-		// add comment
-		if (comment) {
-			properties['Delivery Comment'] = comment;
-		}
+    // add comment
+    if (comment) {
+      properties['Delivery Comment'] = comment;
+    }
 
 
-		Object.keys(properties).forEach(key => {
-			const input = document.createElement('input');
-			input.classList = 'donate-property';
-			input.type = 'hidden';
-			input.name = `properties[${key}]`;
-			input.value = properties[key];
-			form.appendChild(input);
-		});
+    Object.keys(properties).forEach(key => {
+      const input = document.createElement('input');
+      input.classList = 'donate-property';
+      input.type = 'hidden';
+      input.name = `properties[${key}]`;
+      input.value = properties[key];
+      form.appendChild(input);
+    });
 
-		// Trigger the default Shopify Add to Cart button
-		if (originalAddToCartButton) {
-			originalAddToCartButton.click();
-			// delete all html properties
-			setTimeout(() => {
-				document.querySelectorAll('.donate-property').forEach(el => el.remove());
-			}, 0);
-		} else {
-			addToCart(productVariantId, qty);
-		}
-	}
+    // Trigger the default Shopify Add to Cart button
+    if (originalAddToCartButton) {
+      originalAddToCartButton.click();
+      // delete all html properties
+      setTimeout(() => {
+        document.querySelectorAll('.donate-property').forEach(el => el.remove());
+      }, 0);
+    } else {
+      addToCart(productVariantId, qty);
+    }
+  }
 
-	function addToCart(productVariantId, qty) {
-		fetch('/cart/add.js', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				items: [{
-				id: productVariantId,
-				quantity: qty,
-				properties: {
-					'For Donation': 'Yes',
-					'Shipping Name': organization.name,
-					'Shipping Phone': organization.phone_number,
-					'Shipping City': organization.country + ', ' + organization.state_province_region + ', ' + organization.city + ', ' + organization.zip,
-					'Shipping Address': organization.address_line1 + ', ' + (organization.address_line2 ? organization.address_line2 : ''),
-				}
-				}]
-			})
-		}).then(response => response.json())
-		.then(data => window.location.reload())
-		.catch((error) => console.error('Error:', error));
+  function addToCart(productVariantId, qty) {
+    fetch('/cart/add.js', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        items: [{
+        id: productVariantId,
+        quantity: qty,
+        properties: {
+          'For Donation': 'Yes',
+          'Shipping Name': organization.name,
+          'Shipping Phone': organization.phone_number,
+          'Shipping City': organization.country + ', ' + organization.state_province_region + ', ' + organization.city + ', ' + organization.zip,
+          'Shipping Address': organization.address_line1 + ', ' + (organization.address_line2 ? organization.address_line2 : ''),
+        }
+        }]
+      })
+    }).then(response => response.json())
+    .then(data => window.location.reload())
+    .catch((error) => console.error('Error:', error));
 
-	}
+  }
 
-	function injectButton(txt = 'Donate this') {
-		const btn = document.createElement('button');
-		btn.innerHTML = txt;
-		btn.onclick = injectPropertiesAndSubmit;
-		document.querySelector('.donate_wrapper').appendChild(btn);
-	}
+  function injectButton(txt = 'Donate this') {
+    const btn = document.createElement('button');
+    btn.innerHTML = txt;
+    btn.onclick = injectPropertiesAndSubmit;
+    document.querySelector('.donate_wrapper').appendChild(btn);
+  }
 
-	var productJson = document.querySelector('script[type="application/json"]');
-	if (productJson) {
-		var productData = JSON.parse(productJson.innerText);
-		if (productData && productData.product) {
-			console.log("Product ID:", productData.product.id);
-		}
-	}	
+  var productJson = document.querySelector('script[type="application/json"]');
+  if (productJson) {
+    var productData = JSON.parse(productJson.innerText);
+    if (productData && productData.product) {
+      console.log("Product ID:", productData.product.id);
+    }
+  }  
 
-	// preview in editor mode
-	if (window.location.href.includes('oseid')) {
-		injectButton();
-	} else {
-		getPair();
-	}
+  // preview in editor mode
+  if (window.location.href.includes('oseid')) {
+    injectButton();
+  } else {
+    getPair();
+  }
 }); 
 </script>
 
 <style>
-	div[id^="shopify-block-shortage2_donate_button_"] {
-		margin: -25px 0 0 0;
-	}
-	/* Get extension settings */
-	
-	.donate_wrapper button {
-		font-family: {{ block.settings.font_family | default: 'inherit' }};
-		margin-top: {{ block.settings.margin_top }}px;
-		font-size: {{ block.settings.font_size }}px;
-		font-weight: {{ block.settings.font_weight }};
-		color: {{ block.settings.font_color }};
-		background-color: {{ block.settings.button_bg_color }};
-		width: {{ block.settings.button_width }}%;
-		line-height: {{ block.settings.button_line_height }}px;
-		border: {{ block.settings.border_size }}px solid {{ block.settings.border_color }};
-		border-radius: {{ block.settings.border_radius }}px;
-		transition: all 0.3s ease;
-		position: relative;
-		cursor: pointer;
-	}
+  div[id^="shopify-block-shortage2_donate_button_"] {
+    margin: -25px 0 0 0;
+  }
+  /* Get extension settings */
+  
+  .donate_wrapper button {
+    font-family: {{ block.settings.font_family | default: 'inherit' }};
+    margin-top: {{ block.settings.margin_top }}px;
+    font-size: {{ block.settings.font_size }}px;
+    font-weight: {{ block.settings.font_weight }};
+    color: {{ block.settings.font_color }};
+    background-color: {{ block.settings.button_bg_color }};
+    width: {{ block.settings.button_width }}%;
+    line-height: {{ block.settings.button_line_height }}px;
+    border: {{ block.settings.border_size }}px solid {{ block.settings.border_color }};
+    border-radius: {{ block.settings.border_radius }}px;
+    transition: all 0.3s ease;
+    position: relative;
+    cursor: pointer;
+  }
 
-	.donate_wrapper button:hover {
-		{% if block.settings.hover_effect == 'font_size' %}
-			font-size: calc({{ block.settings.font_size }}px * 1.1);
-		{% elsif block.settings.hover_effect == 'button_size' %}
-			transform: scale(1.03);
-		{% elsif block.settings.hover_effect == 'color_swap' %}
-			filter: invert(100%);
-		{% elsif block.settings.hover_effect == 'border_animation' %}
-		{% endif %}
-	}
+  .donate_wrapper button:hover {
+    {% if block.settings.hover_effect == 'font_size' %}
+      font-size: calc({{ block.settings.font_size }}px * 1.1);
+    {% elsif block.settings.hover_effect == 'button_size' %}
+      transform: scale(1.03);
+    {% elsif block.settings.hover_effect == 'color_swap' %}
+      filter: invert(100%);
+    {% elsif block.settings.hover_effect == 'border_animation' %}
+    {% endif %}
+  }
 
-	
-	{% if block.settings.hover_effect == 'border_animation' %}
-		.donate_wrapper button:hover::before,
-		.donate_wrapper button:hover::after {
-			content: "";
-			position: absolute;
-			top: -7px;
-			left: -7px;
-			right: -7px;
-			bottom: -7px;
-			border: {{ block.settings.border_size }}px solid {{ block.settings.border_color }};
-			border-radius: {{ block.settings.border_radius }}px;
-			transition: all .5s;
-			animation: clippath 3s infinite linear;
-		}
-		.donate_wrapper button:hover::after {
-			animation: clippath 3s infinite -1.5s linear;
-		}
-	{% endif %}
+  
+  {% if block.settings.hover_effect == 'border_animation' %}
+    .donate_wrapper button:hover::before,
+    .donate_wrapper button:hover::after {
+      content: "";
+      position: absolute;
+      top: -7px;
+      left: -7px;
+      right: -7px;
+      bottom: -7px;
+      border: {{ block.settings.border_size }}px solid {{ block.settings.border_color }};
+      border-radius: {{ block.settings.border_radius }}px;
+      transition: all .5s;
+      animation: clippath 3s infinite linear;
+    }
+    .donate_wrapper button:hover::after {
+      animation: clippath 3s infinite -1.5s linear;
+    }
+  {% endif %}
 
-	@keyframes clippath {
-		0%,
-		100% {
-			clip-path: inset(0 0 98% 0);
-		}  
-		25% {
-			clip-path: inset(0 98% 0 0);
-		}
-		50% {
-			clip-path: inset(98% 0 0 0);
-		}
-		75% {
-			clip-path: inset(0 0 0 98%);
-		}
-	}
+  @keyframes clippath {
+    0%,
+    100% {
+      clip-path: inset(0 0 98% 0);
+    }  
+    25% {
+      clip-path: inset(0 98% 0 0);
+    }
+    50% {
+      clip-path: inset(98% 0 0 0);
+    }
+    75% {
+      clip-path: inset(0 0 0 98%);
+    }
+  }
 </style>
 
 {% schema %}
 {
-	"name": "Donate Button",
-	"target": "section",
-	"settings": [
-		{
-			"type": "range",
-			"id": "margin_top",
-			"label": "Margin Top",
-			"min": 0,
-			"max": 100,
-			"default": 10,
-			"unit": "px"
-		},
-		{
-			"type": "range",
-			"id": "font_size",
-			"label": "Font Size",
-			"min": 10,
-			"max": 100,
-			"default": 16,
-			"unit": "px"
-		},
-		{
-			"type": "select",
-			"id": "font_weight",
-			"label": "Font Weight",
-			"options": [
-				{
-					"value": "400",
-					"label": "Regular"
-				},
-				{
-					"value": "600",
-					"label": "Semi-Bold"
-				},
-				{
-					"value": "700",
-					"label": "Bold"
-				}
-			],
-			"default": "400"
-		},
-		{
-			"type": "color",
-			"id": "font_color",
-			"label": "Font Color",
-			"default": "#000000"
-		},
-		{
-			"type": "color",
-			"id": "button_bg_color",
-			"label": "Button Background Color",
-			"default": "#ffe4c4"
-		},
-		{
-			"type": "range",
-			"id": "button_width",
-			"label": "Button Width",
-			"min": 50,
-			"max": 100,
-			"default": 100,
-			"unit": "%"
-		},
-		{
-			"type": "range",
-			"id": "button_line_height",
-			"label": "Button Line Height",
-			"min": 0,
-			"max": 100,
-			"default": 40,
-			"unit": "px"
-		},
-		{
-			"type": "range",
-			"id": "border_size",
-			"label": "Border Size",
-			"min": 0,
-			"max": 10,
-			"default": 1,
-			"unit": "px"
-		},
-		{
-			"type": "color",
-			"id": "border_color",
-			"label": "Border Color",
-			"default": "#000000"
-		},
-		{
-			"type": "range",
-			"id": "border_radius",
-			"label": "Border Radius",
-			"min": 0,
-			"max": 50,
-			"default": 5,
-			"unit": "px"
-		},
-		{
-			"type": "text",
-			"id": "font_family",
-			"label": "Font Family",
-			"default": "inherit"
-		},
-		{
-			"type": "select",
-			"id": "hover_effect",
-			"label": "Hover Effect",
-			"options": [
-				{
-					"value": "button_size",
-					"label": "Button Size"
-				}, 
-				{
-					"value": "font_size",
-					"label": "Font Size"
-				},
-				{
-					"value": "color_swap",
-					"label": "Color Swap"
-				},
-				{
-					"value": "border_animation",
-					"label": "Border Animation"
-				}
-			],
-			"default": "border_animation"
-		}
-	]
+  "name": "Donate Button",
+  "target": "section",
+  "settings": [
+    {
+      "type": "range",
+      "id": "margin_top",
+      "label": "Margin Top",
+      "min": 0,
+      "max": 100,
+      "default": 10,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Font Size",
+      "min": 10,
+      "max": 100,
+      "default": 16,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "Font Weight",
+      "options": [
+        {
+          "value": "400",
+          "label": "Regular"
+        },
+        {
+          "value": "600",
+          "label": "Semi-Bold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "font_color",
+      "label": "Font Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Button Background Color",
+      "default": "#ffe4c4"
+    },
+    {
+      "type": "range",
+      "id": "button_width",
+      "label": "Button Width",
+      "min": 50,
+      "max": 100,
+      "default": 100,
+      "unit": "%"
+    },
+    {
+      "type": "range",
+      "id": "button_line_height",
+      "label": "Button Line Height",
+      "min": 0,
+      "max": 100,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "border_size",
+      "label": "Border Size",
+      "min": 0,
+      "max": 10,
+      "default": 1,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Border Radius",
+      "min": 0,
+      "max": 50,
+      "default": 5,
+      "unit": "px"
+    },
+    {
+      "type": "text",
+      "id": "font_family",
+      "label": "Font Family",
+      "default": "inherit"
+    },
+    {
+      "type": "select",
+      "id": "hover_effect",
+      "label": "Hover Effect",
+      "options": [
+        {
+          "value": "button_size",
+          "label": "Button Size"
+        }, 
+        {
+          "value": "font_size",
+          "label": "Font Size"
+        },
+        {
+          "value": "color_swap",
+          "label": "Color Swap"
+        },
+        {
+          "value": "border_animation",
+          "label": "Border Animation"
+        }
+      ],
+      "default": "border_animation"
+    }
+  ]
 }
 {% endschema %}
 
