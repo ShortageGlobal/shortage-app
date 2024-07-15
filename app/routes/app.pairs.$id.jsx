@@ -25,7 +25,7 @@ import { ImageMajor } from '@shopify/polaris-icons';
 import { ShortageProductSelectModal } from '~/components/ShortageProductSelectModal/ShortageProductSelectModal';
 import {
   getOrganizationAddress,
-  getProductAddress,
+  getShortageProductUrl,
 } from '~/services/Shortage.service';
 
 import db from '../db.server';
@@ -228,7 +228,7 @@ export default function ProductPairForm() {
                   <VerticalStack>
                     <Text as='span' variant='headingMd' fontWeight='semibold'>
                       <Link
-                        url={getProductAddress({
+                        url={getShortageProductUrl({
                           slug: formState.shortageProductId,
                           orgSlug: formState.shortageOrganizationId,
                         })}

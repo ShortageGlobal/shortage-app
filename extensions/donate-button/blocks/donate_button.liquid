@@ -1,9 +1,10 @@
 
 <div class="donate_wrapper"></div>
+
 <script>
-var product_id = {{product.id}};
-var tunel_url = 'https://coupon-willow-services-subjective.trycloudflare.com';
-var productPair = [];
+const product_id = {{product.id}};
+const tunel_url = 'https://eyed-advances-stack-symposium.trycloudflare.com';
+let productPair = null;
 
 document.addEventListener('DOMContentLoaded', function() {
 	const originalAddToCartButton = document.querySelector('[type="submit"][name="add"]');
@@ -12,9 +13,10 @@ document.addEventListener('DOMContentLoaded', function() {
 		if(!product_id) return;
 
 		fetch(tunel_url + '/pair?prodId='+ product_id).then(res => res.json()).then(data => {
-			console.log("🚀 ~ data:", data);
-			if(data && data.exists) injectButton();
-			productPair = data.product;
+			if(data && data.exists) {
+				injectButton();
+				productPair = data.product;
+			}
 		})
 	}
 
@@ -35,16 +37,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		const response = await fetch(tunel_url + '/organization?organizationSlug=' + productPair.shortageOrganizationId);
 		const data = await response.json();
-		console.log("🚀 ~ getOrganisationInfo:", data);
 		return data && data.exists ? data.organization : null;
 	}
 
 	async function injectPropertiesAndSubmit(productVariantId = getProdVarId(), qty = getQuantity()) {
-		if (!productVariantId) return;
+		if (!productVariantId || !productPair) return;
 
-		const organization = await getOrganisationInfo();
-		if (!organization) {
-			console.error('Organization not found!');
+		const instruction = await getOrganisationInfo();
+		if (!instruction) {
+			console.error('Delivery instruction not found!');
 			return;
 		}
 
@@ -58,11 +59,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		const properties = {
 			'For Donation': 'Yes',
-			'Shipping Name': organization.name,
-			'Shipping Phone': organization.phone_number,
-			'Shipping Address': `${organization.address_line1}, ${organization.address_line2 || ''}`,
-			'Shipping City': `${organization.country}, ${organization.state_province_region}, ${organization.city}, ${organization.zip}`
+			'Nonprofit Recipient': productPair.shortageOrganizationName,
 		};
+
+		const addressLine1 = instruction.address_line1;
+		const addressLine2 = instruction.address_line2;
+		const phoneNumber = instruction.phone_number;
+		const comment = instruction.comment;
+
+		// add address line 1
+		if (addressLine1) {
+			const addressKey = addressLine2 ? 'Delivery Address Line 1' : 'Delivery Address';
+			properties[addressKey] = addressLine1;
+		}
+
+		// add address line 2
+		if (addressLine2) {
+			properties['Delivery Address Line 2'] = addressLine2;
+		}
+
+		// add city, state, zip, country
+		properties['Delivery City'] = `${instruction.city} ${instruction.state_province_region} ${instruction.zip}, ${instruction.country}`
+
+		// add phone number
+		if (phoneNumber) {
+			properties['Delivery Phone'] = phoneNumber;
+		}
+
+		// add comment
+		if (comment) {
+			properties['Delivery Comment'] = comment;
+		}
+
 
 		Object.keys(properties).forEach(key => {
 			const input = document.createElement('input');
@@ -112,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	function injectButton(txt = 'Donate this') {
 		const btn = document.createElement('button');
-		btn.innerHTML = 'Donate This';
+		btn.innerHTML = txt;
 		btn.onclick = injectPropertiesAndSubmit;
 		document.querySelector('.donate_wrapper').appendChild(btn);
 	}
@@ -125,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 	}	
 
-	//preview in editor mode
+	// preview in editor mode
 	if (window.location.href.includes('oseid')) {
 		injectButton();
 	} else {
@@ -138,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	div[id^="shopify-block-shortage2_donate_button_"] {
 		margin: -25px 0 0 0;
 	}
-	/* Get extansion settings */
+	/* Get extension settings */
 	
 	.donate_wrapper button {
 		font-family: {{ block.settings.font_family | default: 'inherit' }};

@@ -1,27 +1,29 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
+client_id = "f7208c484c27f835e1c5a6dc9636045c"
 name = "Shortage"
-client_id = "da512afd49d7585bdfbe23a0d1453ba5"
-application_url = "https://warranties-alphabetical-community-staffing.trycloudflare.com"
+handle = "shortage"
+application_url = "https://eyed-advances-stack-symposium.trycloudflare.com"
 embedded = true
-
-[access_scopes]
-# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "read_products,write_products,read_orders,write_orders,read_customers"
-
-[auth]
-redirect_urls = [
-  "https://warranties-alphabetical-community-staffing.trycloudflare.com/auth/callback",
-  "https://warranties-alphabetical-community-staffing.trycloudflare.com/auth/shopify/callback",
-  "https://warranties-alphabetical-community-staffing.trycloudflare.com/api/auth/callback"
-]
-
-[webhooks]
-api_version = "2023-10"
-
-[pos]
-embedded = false
 
 [build]
 automatically_update_urls_on_dev = true
-dev_store_url = "shortagedev.myshopify.com"
+dev_store_url = "shortage-dev.myshopify.com"
+include_config_on_deploy = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_customers,read_orders,read_products,write_orders,write_products"
+
+[auth]
+redirect_urls = [
+  "https://eyed-advances-stack-symposium.trycloudflare.com/auth/callback",
+  "https://eyed-advances-stack-symposium.trycloudflare.com/auth/shopify/callback",
+  "https://eyed-advances-stack-symposium.trycloudflare.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2024-07"
+
+[pos]
+embedded = false

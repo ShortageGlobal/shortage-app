@@ -1,18 +1,20 @@
 import db from '../db.server';
 
 export async function getPairByProdId(productId) {
-  const productPair = await db.shortageProductPair.findFirst({ where: { productId : 'gid://shopify/Product/'+productId } });
-  
+  const productPair = await db.shortageProductPair.findFirst({
+    where: { productId: 'gid://shopify/Product/' + productId },
+  });
+
   return productPair;
 }
 
 export async function getAllPairsByIdMap(productIds) {
-  let productPairs = await getAllPairsByProdIds(productIds);
+  const productPairs = await getAllPairsByProdIds(productIds);
 
   // Transform the list of pairs into a map indexed by product ID
   const pairsMap = productPairs.reduce((acc, pair) => {
     const productId = pair.productId.split('/').pop(); // Extract the numeric ID part
-    if(productId) acc[productId] = pair;
+    if (productId) acc[productId] = pair;
     return acc;
   }, {});
 
@@ -20,14 +22,13 @@ export async function getAllPairsByIdMap(productIds) {
 }
 
 async function getAllPairsByProdIds(productIds) {
-  const productGids = productIds.map(id => 'gid://shopify/Product/' + id);
-  console.log('getAllPairsByProdIds productGids', productGids);
+  const productGids = productIds.map((id) => 'gid://shopify/Product/' + id);
   const productPairs = await db.shortageProductPair.findMany({
     where: {
       productId: {
-        in: productGids
-      }
-    }
+        in: productGids,
+      },
+    },
   });
 
   return productPairs;

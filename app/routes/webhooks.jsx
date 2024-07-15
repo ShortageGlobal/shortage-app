@@ -1,24 +1,31 @@
 import { authenticate } from '../shopify.server';
 import db from '../db.server';
-
-import { handleOrderCreation } from '../services/orderService.server';
-import { notifyShortage } from '../services/orderService.server';
+import {
+  handleOrderCreation,
+  notifyShortage,
+} from '../services/orderService.server';
 
 export const action = async ({ request }) => {
-  const { topic, shop, session, payload, admin } = await authenticate.webhook(request);
+  const { topic, shop, session, payload, admin } = await authenticate.webhook(
+    request
+  );
 
   switch (topic) {
     case 'PRODUCTS_UPDATE':
-      console.log('\n\n\nPRODUCTS_UPDATE\n\n\n');
+      console.log('\nPRODUCTS_UPDATE\n');
       break;
-    case "CHECKOUTS_CREATE":
-      console.log('\n\n CHECKOUTS_CREATE\n\n\n', payload);
+    case 'CHECKOUTS_CREATE':
+      console.log('\nCHECKOUTS_CREATE\n');
       break;
     case 'ORDERS_CREATE':
-      console.log('\n\n\nORDERS_CREATE\n\n\n', payload);
+      console.log(`\nORDERS_CREATE\n`);
       if (session) {
         await handleOrderCreation(payload, shop, session.accessToken);
-        await notifyShortage(payload, admin, session);
+
+        // TODO: make sure this request doesn't fail.
+        // There is no await because Shopify timeouts the webhook if it takes too long.
+        // And package creation takes ~7 seconds.
+        notifyShortage(payload, admin, session);
       }
       break;
     case 'APP_UNINSTALLED':
