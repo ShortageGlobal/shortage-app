@@ -49,7 +49,6 @@ export async function getOrganization(organizationSlug) {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'Shopify-Authorization': '', // apiKey
     },
   };
 
