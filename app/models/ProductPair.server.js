@@ -1,5 +1,39 @@
 import db from '../db.server';
 
+export async function getPairByProdId(productId) {
+  const productPair = await db.shortageProductPair.findFirst({
+    where: { productId: 'gid://shopify/Product/' + productId },
+  });
+
+  return productPair;
+}
+
+export async function getAllPairsByIdMap(productIds) {
+  const productPairs = await getAllPairsByProdIds(productIds);
+
+  // Transform the list of pairs into a map indexed by product ID
+  const pairsMap = productPairs.reduce((acc, pair) => {
+    const productId = pair.productId.split('/').pop(); // Extract the numeric ID part
+    if (productId) acc[productId] = pair;
+    return acc;
+  }, {});
+
+  return pairsMap;
+}
+
+async function getAllPairsByProdIds(productIds) {
+  const productGids = productIds.map((id) => 'gid://shopify/Product/' + id);
+  const productPairs = await db.shortageProductPair.findMany({
+    where: {
+      productId: {
+        in: productGids,
+      },
+    },
+  });
+
+  return productPairs;
+}
+
 export async function getProductPair(id, graphql) {
   const ProductPair = await db.shortageProductPair.findFirst({ where: { id } });
 

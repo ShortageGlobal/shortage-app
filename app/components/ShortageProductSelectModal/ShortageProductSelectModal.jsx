@@ -15,7 +15,7 @@ import {
 import {
   getProductId,
   getOrganizationAddress,
-  getProductAddress,
+  getShortageProductUrl,
   fetchAvailableProducts,
 } from '~/services/Shortage.service';
 
@@ -157,7 +157,7 @@ export function ShortageProductSelectModal({
                 orgSlug: organization.slug,
               });
 
-              const productUrl = getProductAddress({
+              const productUrl = getShortageProductUrl({
                 slug,
                 orgSlug: organization.slug,
               });

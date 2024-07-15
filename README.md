@@ -61,6 +61,45 @@ Press P to open the URL to your app. Once you click install, you can start devel
 
 Local development is powered by [the Shopify CLI](https://shopify.dev/docs/apps/tools/cli). It logs into your partners account, connects to an app, provides environment variables, updates remote config, creates a tunnel and provides commands to generate extensions.
 
+#### Give access to personal data scope 
+
+Read about it [here](https://shopify.dev/docs/apps/store/data-protection/protected-customer-data#requirements)
+
+Login to your partner dashboard and select your app:
+![Replace](docs/images/scope_1.png)
+
+Scroll down and click "manage" under "Protected customer data access" section:
+![Replace](docs/images/scope_2.png)
+
+For each personal data, explain why you need it like this:
+![Replace](docs/images/scope_3.png)
+
+Also finish small survey at the bottom:
+![Replace](docs/images/scope_4.png)
+
+#### Replace Tunel Url
+
+After you have previewed your app (by pressing p) 
+you need to replace url in `extensions/donate-button/blocks/donate_button.liquid`
+by new one, which you can obtain from server console log, from line which start like that: "process.env.HOST: ### your new url ###"
+
+```js
+var tunel_url = '### you new url goes here ###';
+```
+
+like that:
+
+![Replace](docs/images/replace_url.png)
+
+#### Add Donate button block to product template
+
+1. Open theme customize
+2. Choose your product template
+3. Place Donate button block under you "Add to cart" button in product form.
+4. Save.
+
+![Replace](docs/images/donate_btn1.png)
+
 #### Migration
 
 Run the following command to apply migrations in Prisma:
