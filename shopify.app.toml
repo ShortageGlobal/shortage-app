@@ -3,7 +3,7 @@
 client_id = "f7208c484c27f835e1c5a6dc9636045c"
 name = "Shortage"
 handle = "shortage"
-application_url = "https://eyed-advances-stack-symposium.trycloudflare.com"
+application_url = "https://donor-store-app.shortage.global"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "read_customers,read_orders,read_products,write_orders,write_products"
 
 [auth]
 redirect_urls = [
-  "https://eyed-advances-stack-symposium.trycloudflare.com/auth/callback",
-  "https://eyed-advances-stack-symposium.trycloudflare.com/auth/shopify/callback",
-  "https://eyed-advances-stack-symposium.trycloudflare.com/api/auth/callback"
+  "https://donor-store-app.shortage.global/auth/callback",
+  "https://donor-store-app.shortage.global/auth/shopify/callback",
+  "https://donor-store-app.shortage.global/api/auth/callback"
 ]
 
 [webhooks]

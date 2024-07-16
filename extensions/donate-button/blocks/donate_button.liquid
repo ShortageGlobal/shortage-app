@@ -3,7 +3,10 @@
 
 <script>
 const product_id = {{product.id}};
-const tunel_url = 'https://eyed-advances-stack-symposium.trycloudflare.com';
+
+// TODO: find a way to use dynamic app url during the local development
+const app_url = 'https://donor-store-app.shortage.global';
+
 let productPair = null;
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -12,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function getPair() {    
     if(!product_id) return;
 
-    fetch(tunel_url + '/pair?prodId='+ product_id).then(res => res.json()).then(data => {
+    fetch(app_url + '/pair?prodId='+ product_id).then(res => res.json()).then(data => {
       if(data && data.exists) {
         injectButton();
         productPair = data.product;
@@ -35,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
   async function getOrganisationInfo() {
     if (!productPair) return;
 
-    const response = await fetch(tunel_url + '/organization?organizationSlug=' + productPair.shortageOrganizationId);
+    const response = await fetch(app_url + '/organization?organizationSlug=' + productPair.shortageOrganizationId);
     const data = await response.json();
     return data && data.exists ? data.organization : null;
   }

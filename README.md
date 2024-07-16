@@ -39,29 +39,24 @@ pnpm install
 
 ### Local Development
 
-Using yarn:
+First, create `.env` and `shopify.app.local.toml` files:
 
 ```shell
-yarn dev
+cp .env.example .env
+cp shopify.app.toml shopify.app.local.toml
 ```
 
-Using npm:
+Use the `shopify.app.local.toml` to run the dev server:
 
 ```shell
-npm run dev
-```
-
-Using pnpm:
-
-```shell
-pnpm run dev
+npm run dev -- -c local
 ```
 
 Press P to open the URL to your app. Once you click install, you can start development.
 
 Local development is powered by [the Shopify CLI](https://shopify.dev/docs/apps/tools/cli). It logs into your partners account, connects to an app, provides environment variables, updates remote config, creates a tunnel and provides commands to generate extensions.
 
-#### Give access to personal data scope 
+#### Give access to personal data scope
 
 Read about it [here](https://shopify.dev/docs/apps/store/data-protection/protected-customer-data#requirements)
 
@@ -79,12 +74,12 @@ Also finish small survey at the bottom:
 
 #### Replace Tunel Url
 
-After you have previewed your app (by pressing p) 
+After you have previewed your app (by pressing p)
 you need to replace url in `extensions/donate-button/blocks/donate_button.liquid`
-by new one, which you can obtain from server console log, from line which start like that: "process.env.HOST: ### your new url ###"
+by new one, which you can obtain from `shopify.app.local.toml`, `application_url` value.
 
 ```js
-var tunel_url = '### you new url goes here ###';
+const app_url = '### your new tunnel url goes here ###';
 ```
 
 like that:
