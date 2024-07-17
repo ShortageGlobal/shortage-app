@@ -29,13 +29,20 @@ export const action = async ({ request }) => {
       }
       break;
     case 'APP_UNINSTALLED':
+      console.log(`\nAPP_UNINSTALLED\n`, payload);
       if (session) {
         await db.session.deleteMany({ where: { shop } });
       }
       break;
     case 'CUSTOMERS_DATA_REQUEST':
+      console.log(`\nCUSTOMERS_DATA_REQUEST\n`);
+      break;
     case 'CUSTOMERS_REDACT':
+      console.log(`\nCUSTOMERS_REDACT\n`);
+      break;
     case 'SHOP_REDACT':
+      console.log(`\nSHOP_REDACT\n`);
+      break;
     default:
       throw new Response('Unhandled webhook topic', { status: 404 });
   }
