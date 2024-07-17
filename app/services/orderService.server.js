@@ -102,6 +102,7 @@ export async function notifyShortage(order, admin, session) {
   for (const [orgSlug, items] of Object.entries(groups)) {
     const packageDetails = {
       type: 'SHOPIFY_PURCHASE',
+      shopify_order_id: order.id,
       email: customer.email,
       first_name: customer.first_name,
       last_name: customer.last_name,
