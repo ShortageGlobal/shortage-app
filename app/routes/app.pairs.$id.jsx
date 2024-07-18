@@ -7,7 +7,6 @@ import {
   useSubmit,
   useNavigate,
 } from '@remix-run/react';
-import { authenticate } from '../shopify.server';
 import {
   Card,
   Button,
@@ -22,17 +21,19 @@ import {
   Link,
 } from '@shopify/polaris';
 import { ImageMajor } from '@shopify/polaris-icons';
+import { authenticate } from '~/shopify.server';
 import { ShortageProductSelectModal } from '~/components/ShortageProductSelectModal/ShortageProductSelectModal';
 import {
   getOrganizationAddress,
   getShortageProductUrl,
 } from '~/services/Shortage.service';
-
-import db from '../db.server';
 import {
   getProductPair,
   validateProductPair,
-} from '../models/ProductPair.server';
+  createPair,
+  updatePair,
+  deletePair,
+} from '~/models/ProductPair.server';
 
 export async function loader({ request, params }) {
   // [START authenticate]
@@ -56,7 +57,7 @@ export async function action({ request, params }) {
   const { shop } = session;
 
   if (request.method === 'DELETE') {
-    await db.shortageProductPair.delete({ where: { id: Number(params.id) } });
+    await deletePair(Number(params.id));
     return redirect('/app');
   }
 
@@ -74,11 +75,8 @@ export async function action({ request, params }) {
 
   const ProductPair =
     params.id === 'new'
-      ? await db.shortageProductPair.create({ data })
-      : await db.shortageProductPair.update({
-          where: { id: Number(params.id) },
-          data,
-        });
+      ? await createPair(data)
+      : await updatePair(Number(params.id), data);
 
   return redirect(`/app/pairs/${ProductPair.id}`);
 }
