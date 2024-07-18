@@ -1,4 +1,4 @@
-import db from '../db.server';
+import db from '~/db.server';
 
 export async function getPairByProdId(productId) {
   const productPair = await db.shortageProductPair.findFirst({
@@ -124,4 +124,23 @@ export function validateProductPair(data) {
   if (Object.keys(errors).length) {
     return errors;
   }
+}
+
+export async function createPair(data) {
+  return db.shortageProductPair.create({ data });
+}
+
+export async function updatePair(id, data) {
+  return db.shortageProductPair.update({
+    where: { id },
+    data,
+  });
+}
+
+export async function deletePair(id) {
+  await db.shortageProductPair.delete({ where: { id } });
+}
+
+export async function deletePairsByShop(shop) {
+  await db.shortageProductPair.deleteMany({ where: { shop } });
 }

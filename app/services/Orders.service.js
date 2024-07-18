@@ -1,7 +1,6 @@
 import fetch from 'node-fetch';
 import { registerPackage } from '~/services/Shortage.service';
-
-import { getAllPairsByIdMap } from '../models/ProductPair.server';
+import { getAllPairsByIdMap } from '~/models/ProductPair.server';
 
 require('dotenv').config();
 

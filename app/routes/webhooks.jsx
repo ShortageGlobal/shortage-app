@@ -1,9 +1,7 @@
-import { authenticate } from '../shopify.server';
-import db from '../db.server';
-import {
-  handleOrderCreation,
-  notifyShortage,
-} from '../services/orderService.server';
+import { authenticate } from '~/shopify.server';
+import db from '~/db.server';
+import { handleOrderCreation, notifyShortage } from '~/services/Orders.service';
+import { redactShop } from '~/services/Shortage.service';
 
 export const action = async ({ request }) => {
   const { topic, shop, session, payload, admin } = await authenticate.webhook(
@@ -36,12 +34,15 @@ export const action = async ({ request }) => {
       break;
     case 'CUSTOMERS_DATA_REQUEST':
       console.log(`\nCUSTOMERS_DATA_REQUEST\n`);
+      // we do not store customer information in the app
       break;
     case 'CUSTOMERS_REDACT':
       console.log(`\nCUSTOMERS_REDACT\n`);
+      // we do not store customer information in the app
       break;
     case 'SHOP_REDACT':
       console.log(`\nSHOP_REDACT\n`);
+      await redactShop(payload);
       break;
     default:
       throw new Response('Unhandled webhook topic', { status: 404 });

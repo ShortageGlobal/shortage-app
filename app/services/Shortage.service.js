@@ -1,3 +1,5 @@
+import { deletePairsByShop } from '~/models/ProductPair.server';
+
 export const SHORTAGE_ROOT = 'https://shortage.global/';
 export const SHORTAGE_API_ROOT = 'https://app.shortage.global/api/';
 
@@ -63,4 +65,9 @@ export async function getOrganization(organizationSlug) {
     console.error('Error fetching organization:', error); // Handle any errors
     return null;
   }
+}
+
+export async function redactShop(payload) {
+  console.log(`Removing pairs for shop: ${payload.shop_domain}`);
+  return deletePairsByShop(payload.shop_domain);
 }
