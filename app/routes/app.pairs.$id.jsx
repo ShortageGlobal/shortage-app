@@ -67,9 +67,6 @@ export async function action({ request, params }) {
     shop,
   };
 
-  console.log('\n\nshop\n\n', shop);
-  console.log('\n\nsession\n\n', session);
-
   const errors = validateProductPair(data);
 
   if (errors) {
