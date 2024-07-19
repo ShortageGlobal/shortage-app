@@ -88,9 +88,9 @@ export async function notifyShortage(order, admin, session) {
 
   const pairs = await getAllPairsByIdMap(donation_items_ids);
 
-  // Group items by shortageOrganizationId
+  // Group items by shortageOrganizationSlug
   const groups = donation_items.reduce((acc, item) => {
-    const orgSlug = pairs[item.product_id].shortageOrganizationId;
+    const orgSlug = pairs[item.product_id].shortageOrganizationSlug;
     if (!acc[orgSlug]) {
       acc[orgSlug] = [];
     }
@@ -114,7 +114,7 @@ export async function notifyShortage(order, admin, session) {
       zip: order.shipping_address.zip,
       country: order.shipping_address.country_code,
       items: items.map((item) => ({
-        product: pairs[item.product_id].shortageProductId,
+        product: pairs[item.product_id].shortageProductSlug,
         quantity: item.quantity,
       })),
     };
