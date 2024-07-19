@@ -128,9 +128,9 @@ export default function ProductPairForm() {
     const { slug, name, photo, organization } = selectedItem;
     setFormState({
       ...formState,
-      shortageOrganizationId: organization.slug,
+      shortageOrganizationSlug: organization.slug,
       shortageOrganizationName: organization.name,
-      shortageProductId: slug,
+      shortageProductSlug: slug,
       shortageProductName: name,
       shortageProductImage: photo,
     });
@@ -142,9 +142,9 @@ export default function ProductPairForm() {
       productId: formState.productId || '',
       productVariantId: formState.productVariantId || '',
 
-      shortageOrganizationId: formState.shortageOrganizationId,
+      shortageOrganizationSlug: formState.shortageOrganizationSlug,
       shortageOrganizationName: formState.shortageOrganizationName,
-      shortageProductId: formState.shortageProductId,
+      shortageProductSlug: formState.shortageProductSlug,
       shortageProductName: formState.shortageProductName,
       shortageProductImage: formState.shortageProductImage,
       // shortageVariantId,
@@ -210,13 +210,13 @@ export default function ProductPairForm() {
                 <Text as={'h2'} variant='headingLg'>
                   Shortage Product
                 </Text>
-                {formState.shortageProductId ? (
+                {formState.shortageProductSlug ? (
                   <Button plain onClick={openShortageProductSelector}>
                     Change product
                   </Button>
                 ) : null}
               </HorizontalStack>
-              {formState.shortageProductId ? (
+              {formState.shortageProductSlug ? (
                 <HorizontalStack blockAlign='center' gap={'5'}>
                   <Thumbnail
                     source={formState.shortageProductImage || ImageMajor}
@@ -227,8 +227,8 @@ export default function ProductPairForm() {
                     <Text as='span' variant='headingMd' fontWeight='semibold'>
                       <Link
                         url={getShortageProductUrl({
-                          slug: formState.shortageProductId,
-                          orgSlug: formState.shortageOrganizationId,
+                          slug: formState.shortageProductSlug,
+                          orgSlug: formState.shortageOrganizationSlug,
                         })}
                         target='_blank'
                         monochrome
@@ -241,7 +241,7 @@ export default function ProductPairForm() {
                       requested by{' '}
                       <Link
                         url={getOrganizationAddress({
-                          orgSlug: formState.shortageOrganizationId,
+                          orgSlug: formState.shortageOrganizationSlug,
                         })}
                         target='_blank'
                         monochrome

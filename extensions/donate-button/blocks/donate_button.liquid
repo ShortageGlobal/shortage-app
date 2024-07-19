@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const response = await fetch(
       app_url +
         "/organization?organizationSlug=" +
-        productPair.shortageOrganizationId,
+        productPair.shortageOrganizationSlug,
     );
     const data = await response.json();
     return data && data.exists ? data.organization : null;

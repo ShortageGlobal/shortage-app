@@ -49,7 +49,19 @@ cp shopify.app.toml shopify.app.local.toml
 Use the `shopify.app.local.toml` to run the dev server:
 
 ```shell
-npm run dev -- -c local
+npm run config:use
+```
+
+Run `postgres` in a separate terminal. Keep it open:
+
+```shell
+docker-compose up
+```
+
+Start the app:
+
+```shell
+npm run dev
 ```
 
 Press P to open the URL to your app. Once you click install, you can start development.

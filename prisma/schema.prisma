@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:dev.sqlite"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Session {
@@ -30,13 +30,15 @@ model ShortageProductPair {
   productVariantId String
 
   // Shortage
-  shortageOrganizationId   String
-  shortageOrganizationName String
-  shortageProductId        String
-  shortageProductName      String
-  shortageProductImage     String
-  shortageVariantId        String?
+  shortageOrganizationSlug  String
+  shortageOrganizationName  String
+  shortageProductSlug       String
+  shortageProductName       String
+  shortageProductImage      String
 
   // Meta
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([shop, productId])
 }

@@ -105,12 +105,12 @@ export function validateProductPair(data) {
     errors.productId = 'Product is required';
   }
 
-  if (!data.shortageOrganizationId) {
-    errors.shortageOrganizationId = 'Shortage organization is required';
+  if (!data.shortageOrganizationSlug) {
+    errors.shortageOrganizationSlug = 'Shortage organization is required';
   }
 
-  if (!data.shortageProductId) {
-    errors.shortageProductId = 'Shortage product is required';
+  if (!data.shortageProductSlug) {
+    errors.shortageProductSlug = 'Shortage product is required';
   }
 
   if (!data.shortageProductName) {
