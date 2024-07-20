@@ -56,7 +56,7 @@ export default function Index() {
       }}
       itemCount={ProductPairs.length}
       headings={[
-        { title: 'Your roduct' },
+        { title: 'Your product' },
         { title: 'Shortage request' },
         { title: 'Date created' },
       ]}
