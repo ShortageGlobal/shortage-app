@@ -22,8 +22,6 @@ export const links = () => [
   ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
 ];
 
-console.log('Stylesheets:', links());
-
 export async function loader({ request }) {
   const errors = loginErrorMessage(await login(request));
 

@@ -23,7 +23,6 @@ export async function handleOrderCreation(order, shop, accessToken) {
 }
 
 export async function addOrderNote(shop, orderId, note, accessToken) {
-  console.log('addOrderNote');
   const SHOPIFY_API_VERSION = process.env.SHOPIFY_API_VERSION
     ? process.env.SHOPIFY_API_VERSION
     : '2024-07';
@@ -60,8 +59,7 @@ async function getCustomerInfo(order, admin, session) {
     });
     return r;
   } catch (e) {
-    console.log('error: ');
-    console.log(e);
+    console.log('getCustomerInfo error: ', e);
   }
 }
 

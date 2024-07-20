@@ -56,8 +56,8 @@ export default function Index() {
       }}
       itemCount={ProductPairs.length}
       headings={[
-        { title: 'Product' },
-        { title: 'Shortage Product' },
+        { title: 'Your Product' },
+        { title: 'Shortage Request' },
         { title: 'Date created' },
       ]}
       selectable={false}
@@ -108,7 +108,7 @@ export default function Index() {
               </IndexTable.Cell>
 
               <IndexTable.Cell>
-                {new Date(createdAt).toDateString()}
+                {new Date(createdAt).toLocaleString()}
               </IndexTable.Cell>
             </IndexTable.Row>
           );

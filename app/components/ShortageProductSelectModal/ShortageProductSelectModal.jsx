@@ -127,7 +127,7 @@ export function ShortageProductSelectModal({
       instant
       open={open}
       onClose={onClose}
-      title='Select Shortage product'
+      title='Select Shortage Request'
       primaryAction={{
         content: 'Select',
         disabled: !selectedItem,
