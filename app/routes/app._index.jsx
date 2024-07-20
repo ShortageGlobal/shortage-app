@@ -56,8 +56,8 @@ export default function Index() {
       }}
       itemCount={ProductPairs.length}
       headings={[
-        { title: 'Your Product' },
-        { title: 'Shortage Request' },
+        { title: 'Your roduct' },
+        { title: 'Shortage request' },
         { title: 'Date created' },
       ]}
       selectable={false}

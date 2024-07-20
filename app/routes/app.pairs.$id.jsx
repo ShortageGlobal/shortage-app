@@ -188,7 +188,7 @@ export default function ProductPairForm() {
             <VerticalStack gap='5'>
               <HorizontalStack align='space-between'>
                 <Text as={'h2'} variant='headingLg'>
-                  Your Product
+                  Your product
                 </Text>
                 {formState.productId ? (
                   <Button plain onClick={openProductSelector}>
@@ -228,7 +228,7 @@ export default function ProductPairForm() {
             <VerticalStack gap='5'>
               <HorizontalStack align='space-between'>
                 <Text as={'h2'} variant='headingLg'>
-                  Shortage Request
+                  Shortage request
                 </Text>
                 {formState.shortageProductSlug ? (
                   <Button plain onClick={openShortageProductSelector}>
