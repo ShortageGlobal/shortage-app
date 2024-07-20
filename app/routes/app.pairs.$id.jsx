@@ -122,6 +122,12 @@ export default function ProductPairForm() {
     const products = await window.shopify.resourcePicker({
       type: 'product',
       action: 'select', // customized action verb, either 'select' or 'add',
+      filter: {
+        hidden: true,
+        variants: false,
+        draft: true,
+        archived: true,
+      },
     });
 
     if (products) {
