@@ -93,31 +93,36 @@ async function supplementProductPair(ProductPair, graphql) {
     productTitle: product.title,
     productImage: product.images?.nodes[0]?.url,
     productAlt: product.images?.nodes[0]?.altText,
-    // destinationUrl: getDestinationUrl(ProductPair),
-    // image: await getProductPairImage(ProductPair.id),
   };
 }
 
-export function validateProductPair(data) {
+export async function validateProductPair(data, id) {
   const errors = {};
 
   if (!data.productId) {
     errors.productId = 'Product is required';
   }
 
-  if (!data.shortageOrganizationSlug) {
-    errors.shortageOrganizationSlug = 'Shortage organization is required';
+  console.log('\n\ndata', data);
+
+  // check if product is already paired with Shortage
+  const existingPair = await db.shortageProductPair.findFirst({
+    where: { shop: data.shop, productId: data.productId, NOT: { id } },
+  });
+
+  if (existingPair) {
+    errors.pairExists = { existingPair };
   }
 
-  if (!data.shortageProductSlug) {
-    errors.shortageProductSlug = 'Shortage product is required';
-  }
-
-  if (!data.shortageProductName) {
-    errors.shortageProductName = 'Shortage product name is required';
-  }
-
-  if (!data.shortageProductImage) {
+  // validate Shortage request
+  if (
+    !data.shortageProductSlug ||
+    !data.shortageProductName ||
+    !data.shortageOrganizationSlug ||
+    !data.shortageOrganizationName
+  ) {
+    errors.shortageProduct = 'Shortage request is required';
+  } else if (!data.shortageProductImage) {
     errors.shortageProductImage = 'Shortage product image is required';
   }
 

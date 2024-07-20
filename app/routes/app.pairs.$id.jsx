@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { json, redirect } from '@remix-run/node';
 import {
   useActionData,
@@ -19,6 +19,7 @@ import {
   VerticalStack,
   PageActions,
   Link,
+  Banner,
 } from '@shopify/polaris';
 import { ImageMajor } from '@shopify/polaris-icons';
 import { authenticate } from '~/shopify.server';
@@ -43,8 +44,13 @@ export async function loader({ request, params }) {
   // [START data]
   if (params.id === 'new') {
     return json({
-      destination: 'product',
-      title: '',
+      productId: '',
+      productVariantId: '',
+      shortageOrganizationSlug: '',
+      shortageOrganizationName: '',
+      shortageProductSlug: '',
+      shortageProductName: '',
+      shortageProductImage: '',
     });
   }
 
@@ -67,7 +73,10 @@ export async function action({ request, params }) {
     shop,
   };
 
-  const errors = validateProductPair(data);
+  const errors = await validateProductPair(
+    data,
+    params.id === 'new' ? 0 : Number(params.id)
+  );
 
   if (errors) {
     return json({ errors }, { status: 422 });
@@ -85,9 +94,10 @@ export default function ProductPairForm() {
   const errors = useActionData()?.errors || {};
 
   const ProductPair = useLoaderData();
-  const [formState, setFormState] = useState(ProductPair);
 
+  const [formState, setFormState] = useState(ProductPair);
   const [cleanFormState, setCleanFormState] = useState(ProductPair);
+
   const isDirty = JSON.stringify(formState) !== JSON.stringify(cleanFormState);
 
   const [showShortageProductModal, setShowShortageProductModal] =
@@ -98,6 +108,15 @@ export default function ProductPairForm() {
   const isDeleting = nav.state === 'submitting' && nav.formMethod === 'DELETE';
 
   const navigate = useNavigate();
+
+  // populate form state from ProductPair
+  // useful when redirected from a new pair creation to an existing pair
+  useEffect(() => {
+    if (ProductPair?.id) {
+      setFormState(ProductPair);
+      setCleanFormState(ProductPair);
+    }
+  }, [ProductPair?.id]);
 
   async function openProductSelector() {
     const products = await window.shopify.resourcePicker({
@@ -137,7 +156,7 @@ export default function ProductPairForm() {
   }
 
   const submit = useSubmit();
-  function handleSave() {
+  async function handleSave() {
     const data = {
       productId: formState.productId || '',
       productVariantId: formState.productVariantId || '',
@@ -147,7 +166,6 @@ export default function ProductPairForm() {
       shortageProductSlug: formState.shortageProductSlug,
       shortageProductName: formState.shortageProductName,
       shortageProductImage: formState.shortageProductImage,
-      // shortageVariantId,
     };
 
     setCleanFormState({ ...formState });
@@ -170,14 +188,15 @@ export default function ProductPairForm() {
             <VerticalStack gap='5'>
               <HorizontalStack align='space-between'>
                 <Text as={'h2'} variant='headingLg'>
-                  Product
+                  Your product
                 </Text>
                 {formState.productId ? (
                   <Button plain onClick={openProductSelector}>
-                    Change product
+                    Select another
                   </Button>
                 ) : null}
               </HorizontalStack>
+
               {formState.productId ? (
                 <HorizontalStack blockAlign='center' gap={'5'}>
                   <Thumbnail
@@ -193,26 +212,27 @@ export default function ProductPairForm() {
                   <Button onClick={openProductSelector} id='select-product'>
                     Select product
                   </Button>
-                  {errors.productId ? (
-                    <InlineError message={errors.productId} fieldID='product' />
-                  ) : null}
                 </VerticalStack>
               )}
+
+              {errors.productId ? (
+                <InlineError message={errors.productId} fieldID='product' />
+              ) : null}
             </VerticalStack>
           </Card>
         </Layout.Section>
 
-        {/* Shortage Product */}
+        {/* Shortage Request */}
         <Layout.Section oneHalf>
           <Card>
             <VerticalStack gap='5'>
               <HorizontalStack align='space-between'>
                 <Text as={'h2'} variant='headingLg'>
-                  Shortage Product
+                  Shortage request
                 </Text>
                 {formState.shortageProductSlug ? (
                   <Button plain onClick={openShortageProductSelector}>
-                    Change product
+                    Select another
                   </Button>
                 ) : null}
               </HorizontalStack>
@@ -260,14 +280,22 @@ export default function ProductPairForm() {
                   >
                     Select product
                   </Button>
-                  {errors.productId ? (
-                    <InlineError
-                      message={errors.productId}
-                      fieldID='shortageProduct'
-                    />
-                  ) : null}
                 </VerticalStack>
               )}
+
+              {errors.shortageProduct ? (
+                <InlineError
+                  message={errors.shortageProduct}
+                  fieldID='shortageProduct'
+                />
+              ) : null}
+
+              {errors.shortageProductImage ? (
+                <InlineError
+                  message={errors.shortageProductImage}
+                  fieldID='shortageProduct'
+                />
+              ) : null}
             </VerticalStack>
           </Card>
 
@@ -281,6 +309,36 @@ export default function ProductPairForm() {
             }}
           />
         </Layout.Section>
+
+        {errors.pairExists ? (
+          <Layout.Section>
+            <Banner
+              title='Product is already paired'
+              status='warning'
+              action={{
+                content: 'Go to existing pair',
+                url: `/app/pairs/${errors.pairExists.existingPair.id}`,
+              }}
+              secondaryAction={{
+                content: 'Select another product',
+                onAction: openProductSelector,
+              }}
+            >
+              Selected product is already paired with:{' '}
+              <Link
+                url={getShortageProductUrl({
+                  slug: errors.pairExists.existingPair.shortageProductSlug,
+                  orgSlug:
+                    errors.pairExists.existingPair.shortageOrganizationSlug,
+                })}
+                target='_blank'
+              >
+                {errors.pairExists.existingPair.shortageProductName}
+              </Link>
+              . Either delete the existing pair or select another product.
+            </Banner>
+          </Layout.Section>
+        ) : null}
 
         {/* Actions */}
         <Layout.Section>
