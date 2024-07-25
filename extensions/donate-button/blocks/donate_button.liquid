@@ -2,10 +2,16 @@
 <div class="donate_wrapper"></div>
 
 <script>
-const product_id = {{product.id}};
+const productId = {{product.id}};
 
 // TODO: find a way to use dynamic app url during the local development
 const app_url = 'https://donor-store-app.shortage.global';
+
+{% comment %} 
+TODO: localize like this
+{{ 'ratings.home.recommendationText' | t }} 
+{% endcomment %}
+
 
 let productPair = null;
 
@@ -15,9 +21,9 @@ document.addEventListener("DOMContentLoaded", function () {
   );
 
   function getPair() {
-    if (!product_id) return;
+    if (!productId) return;
 
-    fetch(app_url + "/pair?prodId=" + product_id)
+    fetch(`${app_url}/api/pairs/${productId}`)
       .then((res) => res.json())
       .then((data) => {
         if (data && data.exists) {
@@ -47,9 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!productPair) return;
 
     const response = await fetch(
-      app_url +
-        "/organization?organizationSlug=" +
-        productPair.shortageOrganizationSlug,
+      `${app_url}/api/delivery-instructions/${productPair.shortageOrganizationSlug}`
     );
     const data = await response.json();
     return data && data.exists ? data.organization : null;

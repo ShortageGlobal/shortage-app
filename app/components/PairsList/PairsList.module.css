@@ -1,0 +1,21 @@
+.thumbnailWrapper {
+  flex-shrink: 0;
+}
+
+.productCell {
+  min-width: 200px;
+  max-width: 350px;
+}
+
+.shortageProductCell {
+  min-width: 200px;
+  max-width: 350px;
+}
+
+.deletedProductAlertItem {
+  width: 20px;
+}
+
+.normalWhiteSpace {
+  white-space: normal;
+}
