@@ -2,7 +2,10 @@ import db from '~/db.server';
 
 export async function getPairByProdId(productId: string) {
   const productPair = await db.shortageProductPair.findFirst({
-    where: { productId: 'gid://shopify/Product/' + productId },
+    where: {
+      productId: 'gid://shopify/Product/' + productId,
+      isVerified: true,
+    },
   });
 
   return productPair;
