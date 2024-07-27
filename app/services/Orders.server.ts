@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { registerPackage } from '~/services/Shortage.service';
+import { registerPackage } from '~/services/Shortage.server';
 import { getAllPairsByIdMap } from '~/models/ProductPair';
 
 export async function handleOrderCreation(order, shop, accessToken) {
@@ -115,15 +115,9 @@ export async function notifyShortage(order, admin, session) {
     */
     const need_tax_deduction = false;
 
-    const authorizationKey = process.env.SHORTAGE_AUTHORIZATION_KEY || '';
-
-    await registerPackage(
-      orgSlug,
-      {
-        ...packageDetails,
-        need_tax_deduction,
-      },
-      authorizationKey
-    );
+    await registerPackage(orgSlug, {
+      ...packageDetails,
+      need_tax_deduction,
+    });
   }
 }

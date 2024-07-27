@@ -27,9 +27,9 @@ import { ImageIcon } from '@shopify/polaris-icons';
 import { authenticate } from '~/shopify.server';
 import { ShortageProductSelectModal } from '~/components/ShortageProductSelectModal/ShortageProductSelectModal';
 import {
-  getOrganizationAddress,
+  getShortageOrganizationUrl,
   getShortageProductUrl,
-} from '~/services/Shortage.service';
+} from '~/services/Shortage.client';
 import {
   getProductPair,
   validateProductPair,
@@ -276,7 +276,7 @@ export default function ProductPairForm() {
                     <div>
                       requested by{' '}
                       <Link
-                        url={getOrganizationAddress({
+                        url={getShortageOrganizationUrl({
                           orgSlug: formState.shortageOrganizationSlug,
                         })}
                         target='_blank'

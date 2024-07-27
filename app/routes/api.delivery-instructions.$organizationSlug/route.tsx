@@ -1,5 +1,5 @@
 import type { LoaderFunctionArgs } from '@remix-run/node';
-import { getOrganizationDeliveryInstructions } from '~/services/Shortage.service.js';
+import { getOrganizationDeliveryInstructions } from '~/services/Shortage.server';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const organizationSlug = params.organizationSlug;

@@ -3,7 +3,7 @@ import axios, { type CancelTokenSource } from 'axios';
 export const SHORTAGE_ROOT = import.meta.env.VITE_SHORTAGE_ROOT;
 export const SHORTAGE_API_ROOT = import.meta.env.VITE_SHORTAGE_API_ROOT;
 
-export function getOrganizationAddress({ orgSlug }: { orgSlug: string }) {
+export function getShortageOrganizationUrl({ orgSlug }: { orgSlug: string }) {
   return `${SHORTAGE_ROOT}${orgSlug}/`;
 }
 
@@ -32,28 +32,4 @@ export function fetchAvailableProducts({
     params: { search, limit, offset },
     cancelToken: cancelToken?.token,
   });
-}
-
-export function registerPackage(
-  orgSlug: string,
-  orderDetails,
-  authorizationKey: string
-) {
-  return axios.post(
-    `${SHORTAGE_API_ROOT}organizations/${orgSlug}/packages/`,
-    orderDetails,
-    { headers: { 'Shopify-Authorization': authorizationKey } }
-  );
-}
-
-export async function getOrganizationDeliveryInstructions(orgSlug: string) {
-  try {
-    const response = await axios.get(
-      `${SHORTAGE_API_ROOT}organizations/${orgSlug}/instructions/`
-    );
-    return response.data[0];
-  } catch (error) {
-    console.error('Error fetching organization:', error); // Handle any errors
-    return null;
-  }
 }
