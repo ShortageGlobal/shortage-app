@@ -7,12 +7,6 @@ const productId = {{product.id}};
 // TODO: find a way to use dynamic app url during the local development
 const app_url = 'https://donor-store-app.shortage.global';
 
-{% comment %} 
-TODO: localize like this
-{{ 'ratings.home.recommendationText' | t }} 
-{% endcomment %}
-
-
 let productPair = null;
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -201,35 +195,28 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 
 <style>
-div[id^="shopify-block-shortage2_donate_button_"] {
-  margin: -25px 0 0 0;
-}
-/* Get extension settings */
-
 .donate_wrapper button {
-  font-family: {{ block.settings.font_family | default: 'inherit' }};
-  margin-top: {{ block.settings.margin_top }}px;
-  font-size: {{ block.settings.font_size }}px;
-  font-weight: {{ block.settings.font_weight }};
-  color: {{ block.settings.font_color }};
+  font-family: {{ block.settings.button_font_family | default: 'inherit' }};
+  margin-top: {{ block.settings.button_margin_top }}px;
+  font-size: {{ block.settings.button_font_size }}px;
+  font-weight: {{ block.settings.button_font_weight }};
+  color: {{ block.settings.button_font_color }};
   background-color: {{ block.settings.button_bg_color }};
   width: {{ block.settings.button_width }}%;
   line-height: {{ block.settings.button_line_height }}px;
-  border: {{ block.settings.border_size }}px solid {{ block.settings.border_color }};
-  border-radius: {{ block.settings.border_radius }}px;
+  border: {{ block.settings.button_border_size }}px solid {{ block.settings.button_border_color }};
+  border-radius: {{ block.settings.button_border_radius }}px;
   transition: all 0.3s ease;
   position: relative;
   cursor: pointer;
 }
 
 .donate_wrapper button:hover {
-  {% if block.settings.hover_effect == 'font_size' %}
-    font-size: calc({{ block.settings.font_size }}px * 1.1);
-  {% elsif block.settings.hover_effect == 'button_size' %}
+  {% if block.settings.button_hover_effect == 'font_size' %}
+    font-size: calc({{ block.settings.button_font_size }}px * 1.1);
+  {% elsif block.settings.button_hover_effect == 'button_size' %}
     transform: scale(1.03);
-  {% elsif block.settings.hover_effect == 'color_swap' %}
-    filter: invert(100%);
-  {% elsif block.settings.hover_effect == 'border_animation' %}
+  {% elsif block.settings.button_hover_effect == 'border_animation' %}
   {% endif %}
 }
 
@@ -243,8 +230,8 @@ div[id^="shopify-block-shortage2_donate_button_"] {
     left: -7px;
     right: -7px;
     bottom: -7px;
-    border: {{ block.settings.border_size }}px solid {{ block.settings.border_color }};
-    border-radius: {{ block.settings.border_radius }}px;
+    border: {{ block.settings.button_border_size }}px solid {{ block.settings.button_border_color }};
+    border-radius: {{ block.settings.button_border_radius }}px;
     transition: all .5s;
     animation: clippath 3s infinite linear;
   }
@@ -274,19 +261,22 @@ div[id^="shopify-block-shortage2_donate_button_"] {
 {
   "name": "Donate Button",
   "target": "section",
+  "enabled_on": {
+    "templates": ["product"]
+  },
   "settings": [
     {
       "type": "range",
-      "id": "margin_top",
+      "id": "button_margin_top",
       "label": "Margin Top",
       "min": 0,
       "max": 100,
-      "default": 10,
+      "default": 0,
       "unit": "px"
     },
     {
       "type": "range",
-      "id": "font_size",
+      "id": "button_font_size",
       "label": "Font Size",
       "min": 10,
       "max": 100,
@@ -295,7 +285,7 @@ div[id^="shopify-block-shortage2_donate_button_"] {
     },
     {
       "type": "select",
-      "id": "font_weight",
+      "id": "button_font_weight",
       "label": "Font Weight",
       "options": [
         {
@@ -315,20 +305,20 @@ div[id^="shopify-block-shortage2_donate_button_"] {
     },
     {
       "type": "color",
-      "id": "font_color",
+      "id": "button_font_color",
       "label": "Font Color",
-      "default": "#000000"
+      "default": "#ffffff"
     },
     {
       "type": "color",
       "id": "button_bg_color",
-      "label": "Button Background Color",
-      "default": "#ffe4c4"
+      "label": "Background Color",
+      "default": "#00b657"
     },
     {
       "type": "range",
       "id": "button_width",
-      "label": "Button Width",
+      "label": "Width",
       "min": 50,
       "max": 100,
       "default": 100,
@@ -337,7 +327,7 @@ div[id^="shopify-block-shortage2_donate_button_"] {
     {
       "type": "range",
       "id": "button_line_height",
-      "label": "Button Line Height",
+      "label": "Line Height",
       "min": 0,
       "max": 100,
       "default": 40,
@@ -345,11 +335,11 @@ div[id^="shopify-block-shortage2_donate_button_"] {
     },
     {
       "type": "range",
-      "id": "border_size",
+      "id": "button_border_size",
       "label": "Border Size",
       "min": 0,
       "max": 10,
-      "default": 1,
+      "default": 0,
       "unit": "px"
     },
     {
@@ -360,7 +350,7 @@ div[id^="shopify-block-shortage2_donate_button_"] {
     },
     {
       "type": "range",
-      "id": "border_radius",
+      "id": "button_border_radius",
       "label": "Border Radius",
       "min": 0,
       "max": 50,
@@ -369,15 +359,19 @@ div[id^="shopify-block-shortage2_donate_button_"] {
     },
     {
       "type": "text",
-      "id": "font_family",
+      "id": "button_font_family",
       "label": "Font Family",
       "default": "inherit"
     },
     {
       "type": "select",
-      "id": "hover_effect",
+      "id": "button_hover_effect",
       "label": "Hover Effect",
       "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
         {
           "value": "button_size",
           "label": "Button Size"
@@ -387,15 +381,11 @@ div[id^="shopify-block-shortage2_donate_button_"] {
           "label": "Font Size"
         },
         {
-          "value": "color_swap",
-          "label": "Color Swap"
-        },
-        {
           "value": "border_animation",
           "label": "Border Animation"
         }
       ],
-      "default": "border_animation"
+      "default": "none"
     }
   ]
 }
