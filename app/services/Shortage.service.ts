@@ -1,7 +1,7 @@
 import axios, { type CancelTokenSource } from 'axios';
 
-export const SHORTAGE_ROOT = 'https://shortage.global/';
-export const SHORTAGE_API_ROOT = 'https://app.shortage.global/api/';
+export const SHORTAGE_ROOT = import.meta.env.VITE_SHORTAGE_ROOT;
+export const SHORTAGE_API_ROOT = import.meta.env.VITE_SHORTAGE_API_ROOT;
 
 export function getOrganizationAddress({ orgSlug }: { orgSlug: string }) {
   return `${SHORTAGE_ROOT}${orgSlug}/`;

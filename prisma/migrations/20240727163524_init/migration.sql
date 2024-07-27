@@ -30,6 +30,7 @@ CREATE TABLE "ShortageProductPair" (
     "shortageProductSlug" TEXT NOT NULL,
     "shortageProductName" TEXT NOT NULL,
     "shortageProductImage" TEXT NOT NULL,
+    "isVerified" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
