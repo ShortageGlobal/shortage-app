@@ -7,7 +7,11 @@ module.exports = {
     '@remix-run/eslint-config/jest-testing-library',
     'prettier',
   ],
+  plugins: ['prettier'],
   globals: {
     shopify: 'readonly',
+  },
+  rules: {
+    'prettier/prettier': 'error',
   },
 };
