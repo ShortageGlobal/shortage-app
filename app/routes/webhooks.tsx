@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs } from '@remix-run/node';
 import { authenticate } from '~/shopify.server';
 import db from '~/db.server';
-import { handleOrderCreation, notifyShortage } from '~/services/Orders.service';
+import { handleOrderCreation, notifyShortage } from '~/services/Orders.server';
 import { deletePairsByShop } from '~/models/ProductPair';
 
 export const action = async ({ request }: ActionFunctionArgs) => {

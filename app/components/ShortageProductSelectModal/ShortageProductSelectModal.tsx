@@ -11,10 +11,10 @@ import {
 } from '@shopify/polaris';
 import { useDebounce } from 'use-debounce';
 import {
-  getOrganizationAddress,
+  getShortageOrganizationUrl,
   getShortageProductUrl,
   fetchAvailableProducts,
-} from '~/services/Shortage.service';
+} from '~/services/Shortage.client';
 import { useCancelToken, isRequestCancel } from '~/hooks/useCancelToken';
 
 const RESOURCE_NAME = { singular: 'product', plural: 'products' };
@@ -151,7 +151,7 @@ export function ShortageProductSelectModal({
             orgSlug: organization.slug,
           });
 
-          const organizationUrl = getOrganizationAddress({
+          const organizationUrl = getShortageOrganizationUrl({
             orgSlug: organization.slug,
           });
 
