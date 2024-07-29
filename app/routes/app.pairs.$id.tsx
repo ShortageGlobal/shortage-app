@@ -29,7 +29,8 @@ import { ShortageProductSelectModal } from '~/components/ShortageProductSelectMo
 import {
   getShortageOrganizationUrl,
   getShortageProductUrl,
-} from '~/services/Shortage.client';
+} from '~/services/Shortage';
+import { SHORTAGE_ROOT } from '~/services/Shortage.server';
 import {
   getProductPair,
   validateProductPair,
@@ -41,19 +42,22 @@ import {
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { admin } = await authenticate.admin(request);
 
-  if (params.id === 'new') {
-    return json({
-      productId: '',
-      productVariantId: '',
-      shortageOrganizationSlug: '',
-      shortageOrganizationName: '',
-      shortageProductSlug: '',
-      shortageProductName: '',
-      shortageProductImage: '',
-    });
+  let pair = {
+    id: null,
+    productId: '',
+    productVariantId: '',
+    shortageOrganizationSlug: '',
+    shortageOrganizationName: '',
+    shortageProductSlug: '',
+    shortageProductName: '',
+    shortageProductImage: '',
+  };
+
+  if (params.id !== 'new') {
+    pair = await getProductPair(Number(params.id), admin.graphql);
   }
 
-  return json(await getProductPair(Number(params.id), admin.graphql));
+  return json({ pair, shortageRoot: SHORTAGE_ROOT });
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
@@ -79,12 +83,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
     return json({ errors }, { status: 422 });
   }
 
-  const ProductPair =
+  const pair =
     params.id === 'new'
       ? await createPair(data)
       : await updatePair(Number(params.id), data);
 
-  return redirect(`/app/pairs/${ProductPair.id}`);
+  return redirect(`/app/pairs/${pair.id}`);
 }
 
 export default function ProductPairForm() {
@@ -92,10 +96,10 @@ export default function ProductPairForm() {
 
   const errors = useActionData<typeof action>()?.errors || {};
 
-  const ProductPair = useLoaderData<typeof loader>();
+  const { shortageRoot, pair } = useLoaderData<typeof loader>();
 
-  const [formState, setFormState] = useState(ProductPair);
-  const [cleanFormState, setCleanFormState] = useState(ProductPair);
+  const [formState, setFormState] = useState(pair);
+  const [cleanFormState, setCleanFormState] = useState(pair);
   const [showShortageProductSelectModal, setShowShortageProductSelectModal] =
     useState(false);
 
@@ -107,14 +111,14 @@ export default function ProductPairForm() {
 
   const navigate = useNavigate();
 
-  // populate form state from ProductPair
+  // populate form state from the product pair
   // useful when redirected from a new pair creation to an existing pair
   useEffect(() => {
-    if (ProductPair?.id) {
-      setFormState(ProductPair);
-      setCleanFormState(ProductPair);
+    if (pair?.id) {
+      setFormState(pair);
+      setCleanFormState(pair);
     }
-  }, [ProductPair?.id]);
+  }, [pair?.id]);
 
   async function openProductSelector() {
     const products = await shopify.resourcePicker({
@@ -184,7 +188,7 @@ export default function ProductPairForm() {
   return (
     <Page>
       {/* Breadcrumbs */}
-      <ui-title-bar title={ProductPair.id ? 'Edit pair' : 'Create new pair'}>
+      <ui-title-bar title={pair.id ? 'Edit pair' : 'Create new pair'}>
         <button variant='breadcrumb' onClick={() => navigate('/app')}>
           Product pairs
         </button>
@@ -263,8 +267,9 @@ export default function ProductPairForm() {
                     <Text as='span' variant='headingMd' fontWeight='semibold'>
                       <Link
                         url={getShortageProductUrl({
-                          slug: formState.shortageProductSlug,
+                          shortageRoot,
                           orgSlug: formState.shortageOrganizationSlug,
+                          productSlug: formState.shortageProductSlug,
                         })}
                         target='_blank'
                         monochrome
@@ -277,6 +282,7 @@ export default function ProductPairForm() {
                       requested by{' '}
                       <Link
                         url={getShortageOrganizationUrl({
+                          shortageRoot,
                           orgSlug: formState.shortageOrganizationSlug,
                         })}
                         target='_blank'
@@ -319,6 +325,7 @@ export default function ProductPairForm() {
           {/* Shortage Products Modal */}
           {showShortageProductSelectModal ? (
             <ShortageProductSelectModal
+              shortageRoot={shortageRoot}
               onSelect={handleSelectShortageProduct}
               onClose={handleCloseShortageProductSelectModal}
             />
@@ -342,9 +349,11 @@ export default function ProductPairForm() {
               Selected product is already paired with:{' '}
               <Link
                 url={getShortageProductUrl({
-                  slug: errors.pairExists.existingPair.shortageProductSlug,
+                  shortageRoot,
                   orgSlug:
                     errors.pairExists.existingPair.shortageOrganizationSlug,
+                  productSlug:
+                    errors.pairExists.existingPair.shortageProductSlug,
                 })}
                 target='_blank'
               >
@@ -362,8 +371,7 @@ export default function ProductPairForm() {
               {
                 content: 'Delete',
                 loading: isDeleting,
-                disabled:
-                  !ProductPair.id || !ProductPair || isSaving || isDeleting,
+                disabled: !pair.id || isSaving || isDeleting,
                 destructive: true,
                 outline: true,
                 onAction: () => submit({}, { method: 'delete' }),
