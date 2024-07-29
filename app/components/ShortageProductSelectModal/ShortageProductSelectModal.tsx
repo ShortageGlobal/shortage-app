@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { Modal, TitleBar } from '@shopify/app-bridge-react';
 import {
   ResourceList,
@@ -13,26 +13,27 @@ import { useDebounce } from 'use-debounce';
 import {
   getShortageOrganizationUrl,
   getShortageProductUrl,
-  fetchAvailableProducts,
-} from '~/services/Shortage.client';
-import { useCancelToken, isRequestCancel } from '~/hooks/useCancelToken';
+} from '~/services/Shortage';
 
 const RESOURCE_NAME = { singular: 'product', plural: 'products' };
 const resolveItemId = (item) => JSON.stringify(item);
 
 type ShortageProductSelectModalProps = {
+  shortageRoot: string;
   onClose: () => void;
   onSelect: (selectedItem: any) => void;
 };
 
 export function ShortageProductSelectModal({
+  shortageRoot,
   onClose,
   onSelect,
 }: ShortageProductSelectModalProps) {
+  const fetchProductsAbortController = useRef<AbortController>();
+
   const [selectedItems, setSelectedItems] = useState<
     ResourceListProps['selectedItems']
   >([]);
-  const getFetchCancelToken = useCancelToken();
 
   const [items, setItems] = useState([]);
   const [totalItemsCount, setTotalItemsCount] = useState(0);
@@ -52,23 +53,30 @@ export function ShortageProductSelectModal({
 
   // fetch products
   useEffect(() => {
-    const cancelToken = getFetchCancelToken();
+    const controller = new AbortController();
+    fetchProductsAbortController.current?.abort('new request');
+    fetchProductsAbortController.current = controller;
 
     setIsLoading(true);
-    fetchAvailableProducts({
-      search: debouncedSearchQuery,
-      limit: pageSize,
-      offset: pageNumber * pageSize,
-      cancelToken,
-    })
+    fetch(
+      `/api/shortage/available-products?` +
+        new URLSearchParams({
+          search: debouncedSearchQuery,
+          limit: `${pageSize}`,
+          offset: `${pageNumber * pageSize}`,
+        }),
+      { signal: controller.signal }
+    )
+      .then((response) => response.json())
       .then((response) => {
-        console.table(response.data.results);
-        setItems(response.data.results);
-        setTotalItemsCount(response.data.count);
+        console.table(response.results);
+        setItems(response.results);
+        setTotalItemsCount(response.count);
         setIsLoading(false);
       })
-      .catch((rejection) => {
-        if (isRequestCancel(rejection)) {
+      .catch(() => {
+        if (controller.signal.aborted) {
+          // do nothing if request has been cancelled
           return;
         }
         setIsLoading(false);
@@ -146,12 +154,14 @@ export function ShortageProductSelectModal({
           const { name, slug, photo, organization } = item;
           const id = resolveItemId(item);
 
-          const productUrl = getShortageProductUrl({
-            slug,
+          const organizationUrl = getShortageOrganizationUrl({
+            shortageRoot,
             orgSlug: organization.slug,
           });
 
-          const organizationUrl = getShortageOrganizationUrl({
+          const productUrl = getShortageProductUrl({
+            shortageRoot,
+            productSlug: slug,
             orgSlug: organization.slug,
           });
 

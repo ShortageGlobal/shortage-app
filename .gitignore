@@ -8,9 +8,20 @@ node_modules
 /app/public/build
 /prisma/dev.sqlite
 /prisma/dev.sqlite-journal
+/extensions/*/dist
 database.sqlite
 
-.env
-shopify.app.local.toml
+# ide
+.vscode
+.idea
 
-/extensions/*/dist
+# npm logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env
+.DS_Store
+.env
+.env.local
+shopify.app.local.toml
