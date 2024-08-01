@@ -46,7 +46,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       await deletePairsByShop(payload.shop_domain);
       break;
     default:
-      throw new Response('Unhandled webhook topic', { status: 404 });
+      console.log(`\nUnhandled webhook topic: ${topic}\n`);
+      break;
   }
 
   throw new Response();
